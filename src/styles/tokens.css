@@ -1,0 +1,125 @@
+/* JulNow Admin design tokens, from Figma: Primitives, Theme (Light), Layout */
+
+:root {
+  /* Primitives */
+  --neutral-0: #ffffff;
+  --neutral-50: #f8fafc;
+  --neutral-100: #f1f5f9;
+  --neutral-200: #e2e8f0;
+  --neutral-300: #cbd5e1;
+  --neutral-400: #94a3b8;
+  --neutral-500: #64748b;
+  --neutral-600: #475569;
+  --neutral-700: #334155;
+  --neutral-800: #1e293b;
+  --neutral-900: #0f172a;
+
+  --purple-50: #f3e8ff;
+  --purple-100: #ede9fe;
+  --purple-300: #c4b5fd;
+  --purple-500: #8b5cf6;
+  --purple-600: #7c3aed;
+  --purple-700: #6d28d9;
+  --purple-800: #5b21b6;
+
+  --green-50: #ecfdf5;
+  --green-100: #d1fae5;
+  --green-500: #10b981;
+  --green-700: #047857;
+
+  --amber-50: #fffbeb;
+  --amber-100: #fef3c7;
+  --amber-500: #f59e0b;
+  --amber-700: #b45309;
+
+  --red-50: #fef2f2;
+  --red-100: #fee2e2;
+  --red-500: #ef4444;
+  --red-700: #b91c1c;
+
+  --blue-50: #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-500: #3b82f6;
+  --blue-700: #1d4ed8;
+
+  --teal-50: #f0fdfa;
+  --teal-700: #0f766e;
+
+  /* Theme: background */
+  --color-bg-canvas: var(--neutral-50);
+  --color-bg-surface: var(--neutral-0);
+  --color-bg-subtle: var(--neutral-100);
+  --color-bg-hover: var(--neutral-100);
+
+  /* Theme: border */
+  --color-border-default: var(--neutral-200);
+  --color-border-strong: var(--neutral-300);
+
+  /* Theme: text */
+  --color-text-primary: var(--neutral-900);
+  --color-text-secondary: var(--neutral-700);
+  --color-text-muted: var(--neutral-600);
+  --color-text-inverse: var(--neutral-0);
+  --color-text-disabled: var(--neutral-400);
+
+  /* Theme: action */
+  --color-action-primary: var(--purple-700);
+  --color-action-primary-hover: var(--purple-800);
+  --color-action-primary-pressed: var(--purple-800);
+  --color-action-primary-subtle: var(--purple-50);
+  --color-action-primary-disabled: var(--purple-300);
+  --color-action-on-primary: var(--neutral-0);
+
+  /* Theme: status */
+  --color-status-success: var(--green-700);
+  --color-status-success-subtle: var(--green-50);
+  --color-status-warning: var(--amber-700);
+  --color-status-warning-subtle: var(--amber-50);
+  --color-status-danger: var(--red-700);
+  --color-status-danger-subtle: var(--red-50);
+  --color-status-info: var(--neutral-700);
+  --color-status-info-subtle: var(--neutral-100);
+
+  /* Theme: charts */
+  --color-data-series-1: var(--purple-700);
+  --color-data-series-2: var(--purple-500);
+  --color-data-series-3: var(--purple-300);
+  --color-data-series-4: var(--blue-500);
+  --color-data-series-5: var(--amber-500);
+  --color-data-grid: var(--neutral-200);
+
+  /* Theme: focus */
+  --color-focus-ring: var(--purple-300);
+
+  /* Theme: category */
+  --color-category-rental: var(--neutral-700);
+  --color-category-rental-subtle: var(--neutral-100);
+  --color-category-stay: var(--neutral-700);
+  --color-category-stay-subtle: var(--neutral-100);
+  --color-category-travel: var(--neutral-700);
+  --color-category-travel-subtle: var(--neutral-100);
+
+  /* Layout: spacing */
+  --space-0: 0;
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-6: 6px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
+  --space-48: 48px;
+
+  /* Layout: radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 999px;
+
+  /* Typography: check the font name against the Figma text styles */
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+}

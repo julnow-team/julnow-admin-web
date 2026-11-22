@@ -1,0 +1,37 @@
+@import "tailwindcss";
+@import "./styles/tokens.css";
+
+/* Tailwind class names for the Figma tokens, e.g. bg-primary, text-muted, border-line */
+@theme inline {
+  --color-canvas: var(--color-bg-canvas);
+  --color-surface: var(--color-bg-surface);
+  --color-subtle: var(--color-bg-subtle);
+  --color-hover: var(--color-bg-hover);
+
+  --color-line: var(--color-border-default);
+  --color-line-strong: var(--color-border-strong);
+
+  --color-ink: var(--color-text-primary);
+  --color-ink-soft: var(--color-text-secondary);
+  --color-muted: var(--color-text-muted);
+  --color-disabled: var(--color-text-disabled);
+
+  --color-primary: var(--color-action-primary);
+  --color-primary-hover: var(--color-action-primary-hover);
+  --color-primary-subtle: var(--color-action-primary-subtle);
+  --color-on-primary: var(--color-action-on-primary);
+
+  --color-success: var(--color-status-success);
+  --color-success-subtle: var(--color-status-success-subtle);
+  --color-warning: var(--color-status-warning);
+  --color-warning-subtle: var(--color-status-warning-subtle);
+  --color-danger: var(--color-status-danger);
+  --color-danger-subtle: var(--color-status-danger-subtle);
+}
+
+@layer base {
+  body {
+    @apply bg-canvas text-ink;
+    font-family: var(--font-sans);
+  }
+}

@@ -123,3 +123,48 @@
   /* Typography */
   --font-sans: "Kantumruy Pro", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
+
+/* Dark theme, built from the primitives (not exported from Figma yet) */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-bg-canvas: var(--neutral-900);
+  --color-bg-surface: var(--neutral-800);
+  --color-bg-subtle: var(--neutral-700);
+  --color-bg-hover: var(--neutral-700);
+
+  --color-border-default: var(--neutral-700);
+  --color-border-strong: var(--neutral-600);
+
+  --color-text-primary: var(--neutral-50);
+  --color-text-secondary: var(--neutral-300);
+  --color-text-muted: var(--neutral-400);
+  --color-text-inverse: var(--neutral-900);
+  --color-text-disabled: var(--neutral-500);
+
+  --color-action-primary: var(--purple-500);
+  --color-action-primary-hover: var(--purple-600);
+  --color-action-primary-pressed: var(--purple-600);
+  --color-action-primary-subtle: rgb(139 92 246 / 0.18);
+  --color-action-primary-disabled: var(--purple-800);
+  --color-action-on-primary: var(--neutral-0);
+
+  --color-status-success: var(--green-500);
+  --color-status-success-subtle: rgb(16 185 129 / 0.15);
+  --color-status-warning: var(--amber-500);
+  --color-status-warning-subtle: rgb(245 158 11 / 0.15);
+  --color-status-danger: var(--red-500);
+  --color-status-danger-subtle: rgb(239 68 68 / 0.15);
+  --color-status-info: var(--neutral-300);
+  --color-status-info-subtle: var(--neutral-800);
+
+  --color-data-grid: var(--neutral-700);
+  --color-focus-ring: var(--purple-500);
+
+  --color-category-rental: var(--neutral-300);
+  --color-category-rental-subtle: var(--neutral-800);
+  --color-category-stay: var(--neutral-300);
+  --color-category-stay-subtle: var(--neutral-800);
+  --color-category-travel: var(--neutral-300);
+  --color-category-travel-subtle: var(--neutral-800);
+}

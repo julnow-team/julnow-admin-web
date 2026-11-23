@@ -35,3 +35,8 @@
     font-family: var(--font-sans);
   }
 }
+
+/* The logo has black text, so make it light on the dark theme */
+:root[data-theme="dark"] .logo {
+  filter: invert(1) hue-rotate(180deg);
+}

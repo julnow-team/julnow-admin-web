@@ -19,7 +19,12 @@
   --color-primary: var(--color-action-primary);
   --color-primary-hover: var(--color-action-primary-hover);
   --color-primary-subtle: var(--color-action-primary-subtle);
+  --color-primary-disabled: var(--color-action-primary-disabled);
   --color-on-primary: var(--color-action-on-primary);
+
+  --color-focus: var(--color-focus-ring);
+  --color-info: var(--color-status-info);
+  --color-info-subtle: var(--color-status-info-subtle);
 
   --color-success: var(--color-status-success);
   --color-success-subtle: var(--color-status-success-subtle);

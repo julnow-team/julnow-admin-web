@@ -1,20 +1,22 @@
 import { NavLink } from 'react-router-dom'
 import { ChartNoAxesColumn, CreditCard, House, LayoutGrid, LogOut, Settings, Shield, Users } from 'lucide-react'
 import logo from '../../assets/logo.png'
+import { useI18n } from '../../lib/i18n'
 import Avatar from '../Avatar'
 
 const MAIN_ITEMS = [
-  { to: '/', label: 'Overview', icon: LayoutGrid, end: true },
-  { to: '/users', label: 'Users', icon: Users },
-  { to: '/listings', label: 'Listings', icon: House, countKey: 'flaggedListings' },
-  { to: '/subscriptions', label: 'Subscriptions', icon: CreditCard },
-  { to: '/reports', label: 'Reports & Risk', icon: Shield, countKey: 'openCases' },
-  { to: '/analytics', label: 'Analytics', icon: ChartNoAxesColumn },
+  { to: '/', labelKey: 'nav.overview', icon: LayoutGrid, end: true },
+  { to: '/users', labelKey: 'nav.users', icon: Users },
+  { to: '/listings', labelKey: 'nav.listings', icon: House, countKey: 'flaggedListings' },
+  { to: '/subscriptions', labelKey: 'nav.subscriptions', icon: CreditCard },
+  { to: '/reports', labelKey: 'nav.reports', icon: Shield, countKey: 'openCases' },
+  { to: '/analytics', labelKey: 'nav.analytics', icon: ChartNoAxesColumn },
 ]
 
-const SYSTEM_ITEMS = [{ to: '/settings', label: 'Settings', icon: Settings }]
+const SYSTEM_ITEMS = [{ to: '/settings', labelKey: 'nav.settings', icon: Settings }]
 
 function NavItem({ item, count }) {
+  const { t } = useI18n()
   const Icon = item.icon
 
   return (
@@ -28,7 +30,7 @@ function NavItem({ item, count }) {
       }
     >
       <Icon size={18} strokeWidth={2} />
-      <span className="flex-1">{item.label}</span>
+      <span className="flex-1 truncate">{t(item.labelKey)}</span>
       {count > 0 && (
         <span className="rounded-full bg-subtle px-2 py-0.5 text-xs font-medium text-ink-soft">{count}</span>
       )}
@@ -41,6 +43,8 @@ function SectionLabel({ children }) {
 }
 
 export default function Sidebar({ counts, admin, onLogout }) {
+  const { t } = useI18n()
+
   return (
     <aside className="sticky top-0 flex h-screen w-[260px] shrink-0 flex-col gap-1 border-r border-line bg-surface px-4 py-5">
       <div className="flex items-center gap-2 px-2 pt-1 pb-5">
@@ -48,19 +52,19 @@ export default function Sidebar({ counts, admin, onLogout }) {
           <img
             src={logo}
             alt="JulNow"
-            className="absolute max-w-none"
+            className="logo absolute max-w-none"
             style={{ width: '142.27%', height: '255.56%', left: '-20.62%', top: '-81.48%' }}
           />
         </div>
-        <span className="rounded-sm bg-subtle px-2 py-0.5 text-xs font-medium text-ink-soft">Admin</span>
+        <span className="whitespace-nowrap rounded-sm bg-subtle px-2 py-0.5 text-xs font-medium text-ink-soft">{t('app.badge')}</span>
       </div>
 
-      <SectionLabel>MAIN</SectionLabel>
+      <SectionLabel>{t('nav.main')}</SectionLabel>
       {MAIN_ITEMS.map((item) => (
         <NavItem key={item.to} item={item} count={item.countKey ? counts[item.countKey] : 0} />
       ))}
 
-      <SectionLabel>SYSTEM</SectionLabel>
+      <SectionLabel>{t('nav.system')}</SectionLabel>
       {SYSTEM_ITEMS.map((item) => (
         <NavItem key={item.to} item={item} />
       ))}
@@ -73,7 +77,7 @@ export default function Sidebar({ counts, admin, onLogout }) {
           <p className="truncate text-sm font-semibold text-ink">{admin.fullName}</p>
           <p className="truncate text-xs font-medium text-muted">{admin.roleName}</p>
         </div>
-        <button type="button" onClick={onLogout} className="text-ink-soft hover:text-ink" aria-label="Log out">
+        <button type="button" onClick={onLogout} className="text-ink-soft hover:text-ink" aria-label={t('nav.logout')}>
           <LogOut size={20} />
         </button>
       </div>

@@ -1,33 +1,43 @@
+import { LanguageToggle, ThemeToggle } from '../../components/PreferenceToggles'
+import { useI18n } from '../../lib/i18n'
+
 export default function LoginPage() {
+  const { t } = useI18n()
+
   return (
-    <main className="min-h-screen flex items-center justify-center p-6">
-      <div className="w-full max-w-sm bg-surface border border-line rounded-xl p-8">
-        <h1 className="text-2xl font-semibold">JulNow Admin</h1>
-        <p className="mt-1 text-sm text-muted">Sign in to manage users and listings</p>
+    <main className="relative flex min-h-screen items-center justify-center p-6">
+      <div className="absolute top-6 right-6 flex gap-3">
+        <LanguageToggle />
+        <ThemeToggle />
+      </div>
+
+      <div className="w-full max-w-sm rounded-xl border border-line bg-surface p-8">
+        <h1 className="text-2xl font-semibold">{t('login.title')}</h1>
+        <p className="mt-1 text-sm text-muted">{t('login.subtitle')}</p>
 
         <form className="mt-6 flex flex-col gap-4">
           <label className="flex flex-col gap-1 text-sm font-medium">
-            Email
+            {t('login.email')}
             <input
               type="email"
               placeholder="admin@julnow.com"
-              className="h-10 px-3 rounded-md border border-line focus:outline-none focus:border-primary"
+              className="h-10 rounded-md border border-line bg-surface px-3 focus:border-primary focus:outline-none"
             />
           </label>
 
           <label className="flex flex-col gap-1 text-sm font-medium">
-            Password
+            {t('login.password')}
             <input
               type="password"
-              className="h-10 px-3 rounded-md border border-line focus:outline-none focus:border-primary"
+              className="h-10 rounded-md border border-line bg-surface px-3 focus:border-primary focus:outline-none"
             />
           </label>
 
           <button
             type="submit"
-            className="h-10 mt-2 rounded-md bg-primary text-on-primary font-medium hover:bg-primary-hover"
+            className="mt-2 h-10 rounded-md bg-primary font-medium text-on-primary hover:bg-primary-hover"
           >
-            Log in
+            {t('login.submit')}
           </button>
         </form>
       </div>

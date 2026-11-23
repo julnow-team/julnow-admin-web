@@ -120,6 +120,6 @@
   --radius-xl: 16px;
   --radius-full: 999px;
 
-  /* Typography: check the font name against the Figma text styles */
-  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  /* Typography */
+  --font-sans: "Kantumruy Pro", "Segoe UI", system-ui, -apple-system, sans-serif;
 }

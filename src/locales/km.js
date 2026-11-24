@@ -56,6 +56,13 @@ export default {
 
   'search.clear': 'សម្អាតការស្វែងរក',
 
+  'table.empty': 'គ្មានលទ្ធផល',
+  'table.emptyHint': 'សាកល្បងស្វែងរក ឬតម្រងផ្សេង។',
+  'table.reset': 'កំណត់តម្រងឡើងវិញ',
+  'table.errorTitle': 'មិនអាចផ្ទុកទិន្នន័យបានទេ',
+  'table.errorHint': 'សូមព្យាយាមម្តងទៀត។',
+  'table.rowActions': 'សកម្មភាពនៃជួរ',
+
   'pagination.label': 'ការបែងចែកទំព័រ',
   'pagination.summary': 'កំពុងបង្ហាញ {from}–{to} ក្នុងចំណោម {total} {label}',
   'pagination.previous': 'ទំព័រមុន',

@@ -56,6 +56,13 @@ export default {
 
   'search.clear': 'Clear search',
 
+  'table.empty': 'No results',
+  'table.emptyHint': 'Try a different search or filter.',
+  'table.reset': 'Reset filters',
+  'table.errorTitle': 'Could not load the data',
+  'table.errorHint': 'Please try again.',
+  'table.rowActions': 'Row actions',
+
   'pagination.label': 'Pagination',
   'pagination.summary': 'Showing {from}–{to} of {total} {label}',
   'pagination.previous': 'Previous page',

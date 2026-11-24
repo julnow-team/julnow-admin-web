@@ -4,6 +4,8 @@ The Admin web is built first with mock data. This file is the agreement between 
 The mock files in `src/api/mock/` must return exactly these shapes. Backend builds the endpoints from this file.
 If a shape changes, change this file, the mock and the page in the same PR.
 
+Example numbers come from the Figma Overview screen.
+
 ## Rules for every endpoint
 
 - Called through the Gateway (`VITE_API_URL`), path starts with `/api/admin/...`
@@ -11,60 +13,217 @@ If a shape changes, change this file, the mock and the page in the same PR.
 - JSON field names are camelCase. Dates are ISO text (`2026-12-01T08:30:00Z`). Money is a number in USD.
 - Fixed values use the same text as the database CHECK (`ACTIVE`, `PENDING_REVIEW`).
 - List endpoints take `page` (starts at 0), `size` and return `{ items, page, size, totalItems, totalPages }`.
-- Errors return `{ "detail": "message" }` with status 400, 401, 403, 404 or 409. The web shows `detail`.
+- Errors return `{ "code": "MFA_INVALID", "detail": "message", "attemptsLeft": 3 }` with status 400, 401, 403, 404, 409 or 429.
+  `code` is a short UPPER_SNAKE text, the web uses it to decide what to show. `detail` is a message for the person.
+  `attemptsLeft` is only sent by the MFA endpoint.
+- Stats endpoints take `range` = `7d`, `30d` or `90d` (default `30d`). The backend may support only `30d` at first.
+  The response says which range was used, in `range`.
+- The backend never sends sentences for the screen. It sends codes and numbers, the web writes the text with `t()` (English and Khmer).
+
+## Gateway routes
+
+| Path | Service |
+|---|---|
+| `/api/admin/auth/**`, `/api/admin/users/**`, `/api/admin/me` | auth-service (8081) |
+| `/api/admin/listings/**` | listing-service (8082) |
+| `/api/admin/bookings/**` | booking-service (8083) |
+
+The Gateway only routes and checks the JWT. It does not collect data from the services.
 
 ## Status
 
-| Endpoint | Web task | Mock | Backend |
-|---|---|---|---|
-| GET /api/admin/overview | T50 | done | not started |
-| GET /api/admin/me | T20 | done (`navigation.js`) | not started |
-| GET /api/admin/nav-counts | T20 | done (`navigation.js`) | not started |
-| POST /api/admin/auth/login | T21 | todo | not started |
-| POST /api/admin/auth/mfa | T21 | todo | not started |
-| GET /api/admin/users | T37 | todo | not started |
-| PATCH /api/admin/users/{id}/status | T37 | todo | not started |
-| GET /api/admin/listings | T38 | todo | not started |
-| POST /api/admin/listings/{id}/moderation | T38 | todo | not started |
+Priority: P1 = needed for the demo, P2 = after P1, Later = mock only, no real endpoint yet.
 
-## Overview
+| Endpoint | Web task | Priority | Mock | Backend |
+|---|---|---|---|---|
+| GET /api/admin/auth/stats | T50 | P1 | needs update | not started |
+| GET /api/admin/listings/stats | T50 | P1 | needs update | not started |
+| GET /api/admin/bookings/stats | T50 | P1 | needs update | not started |
+| MRR 12-month series | T50 | Later | todo | no endpoint |
+| Recent activity | T50 | Later | todo | no endpoint |
+| Export report | T50 | Later | todo | no endpoint |
+| GET /api/admin/me | T20 | P1 | done (`navigation.js`) | not started |
+| GET /api/admin/nav-counts | T20 | P1 | done (`navigation.js`) | not started (see open questions) |
+| POST /api/admin/auth/login | T21 | P1 | todo | not started |
+| POST /api/admin/auth/mfa | T21 | P1 | todo | not started |
+| POST /api/admin/auth/mfa/resend | T21 | P1 | todo | not started |
+| POST /api/admin/auth/refresh | T21 | P2 | not built | not started |
+| POST /api/admin/auth/logout | T21 | P2 | not built | not started |
+| GET /api/admin/users | T37 | P1 | todo | not started |
+| PATCH /api/admin/users/{id}/status | T37 | P1 | todo | not started |
+| GET /api/admin/listings | T38 | P1 | todo | not started |
+| POST /api/admin/listings/{id}/moderation | T38 | P1 | todo | not started |
 
-`GET /api/admin/overview`. Data comes from three services (auth, listing, booking), so one service
-or the Gateway must collect it. The web calls only this endpoint.
+## Overview (T50)
+
+The Overview page calls the three stats endpoints at the same time. Each section of the page uses its own
+`useApi`, so if one service is down only its sections show an error.
+
+The web puts some numbers together itself:
+
+- Open risk cases = `auth.casesFromUsers` + `listings.casesFromSystem`
+- Owner journey = signups, trial and paid from auth, first listing from listings, first booking from bookings.
+  The percent of each step is the step divided by `signups`.
+- Plan share in Subscription health = plan `count` divided by the sum of all plan counts.
+- Alert cards use the same data: late owners from `subscriptionHealth.lateOwners`, new and flagged listings
+  from `submissions`.
+
+`change` is the percent against the period before. If the backend cannot work it out, it sends `null` and the web hides the badge.
+
+### GET /api/admin/auth/stats?range=30d
 
 ```json
 {
-  "monthlyRevenue": { "value": 12480, "change": 12.5 },
-  "paidSubscriptions": { "value": 312, "change": 8.2, "onTrial": 48 },
-  "activeListings": { "value": 1284, "change": 5.1 },
-  "totalUsers": { "value": 8923, "change": 3.4 },
-  "attention": {
-    "lateOwners": 12,
-    "flaggedToday": 7,
-    "newToday": 26,
-    "openCases": 34,
-    "casesFromUsers": 21,
-    "casesFromSystem": 13
-  }
+  "range": "30d",
+  "asOf": "2026-09-30T09:00:00Z",
+  "totalUsers": { "value": 12847, "change": 8.2 },
+  "monthlyRevenue": { "value": 42698, "change": 11.4 },
+  "paidSubscriptions": { "value": 1818, "change": 8.7, "onTrial": 94 },
+  "subscriptionHealth": {
+    "plans": [
+      { "code": "PRO", "price": 29, "count": 1102 },
+      { "code": "STARTER", "price": 15, "count": 716 },
+      { "code": "TRIAL", "price": 0, "count": 94 }
+    ],
+    "lateOwners": 38,
+    "renewalsNext7Days": 72,
+    "trialsEndingNext7Days": 31,
+    "revenueAtRisk": 850
+  },
+  "ownerJourney": { "signups": 218, "startedTrial": 194, "convertedToPaid": 149 },
+  "casesFromUsers": 25
 }
 ```
 
-`change` is the percent against last month. `lateOwners` counts subscriptions with `grace_until` not passed.
+- `monthlyRevenue` is the monthly price of all ACTIVE subscriptions added together (1,102 x $29 + 716 x $15 = $42,698).
+- `paidSubscriptions.value` counts ACTIVE subscriptions (Pro and Starter). `onTrial` counts TRIALING.
+- `plans` uses `subscriptions.plan_code` and `plans.price_monthly`. The web writes the plan names.
+- `lateOwners` = owners with a PAST_DUE subscription (late, or paused after the 3 day `grace_until`).
+- `revenueAtRisk` = monthly price of those PAST_DUE subscriptions added together.
+- `casesFromUsers` = `reports` with status OPEN, REVIEWING or ESCALATED.
+- `ownerJourney` counts inside the `range`. `subscriptionHealth` is the situation now (`asOf`).
+
+### GET /api/admin/listings/stats?range=30d
+
+```json
+{
+  "range": "30d",
+  "activeListings": { "value": 3462, "change": 12.5 },
+  "pausedListings": 142,
+  "submissions": {
+    "submitted": 24,
+    "autoPublished": 17,
+    "flagged": 7,
+    "flags": [
+      { "type": "DUPLICATE_PHOTOS", "count": 3 },
+      { "type": "PRICE_TOO_HIGH", "count": 2 },
+      { "type": "BANNED_PHONE", "count": 2 }
+    ]
+  },
+  "casesFromSystem": 9,
+  "publishedFirstListing": 161,
+  "riskExceptions": [
+    {
+      "listingId": 48213,
+      "code": "JN-48213",
+      "title": "Riverside Studio - BKK1",
+      "categoryCode": "RENTAL",
+      "subcategoryCode": "ROOM",
+      "level": "HIGH",
+      "flags": [
+        { "type": "DUPLICATE_PHOTOS", "detail": "Same photo as listing JN-47110" },
+        { "type": "PRICE_TOO_HIGH", "detail": "price 43% above area average" }
+      ]
+    }
+  ]
+}
+```
+
+- `activeListings` counts status ACTIVE.
+- `pausedListings` counts status PAUSED. It also counts listings paused for another reason (admin or report), because the
+  database does not keep the reason. The Overview shows it next to late owners.
+- `submissions` is about today, it does not use `range`. `autoPublished` = `submitted` - `flagged` (no new column).
+  `flagged` = listings submitted today with an unresolved flag.
+- `casesFromSystem` = `listing_flags` with `resolved = false`.
+- `publishedFirstListing` = owners whose first listing became ACTIVE inside the `range`.
+- `riskExceptions`: at most 4 listings with unresolved flags, HIGH first, then newest.
+  Only system flags. "Reported by tenant" is not in the API for now (it would need auth data), it stays in the mock only.
+- `level` = HIGH when the listing has 2 or more unresolved flags or has BANNED_PHONE, otherwise MEDIUM.
+- `code` = `JN-` + listing id. `detail` is plain text from the system check, the web shows it as it is.
+
+### GET /api/admin/bookings/stats?range=30d
+
+```json
+{ "range": "30d", "ownersWithFirstBooking": 87 }
+```
+
+`ownersWithFirstBooking` = owners whose first booking was created inside the `range`.
+
+### Mock only (Later)
+
+No real endpoint and no new table for these. The web gets them from `src/api/mock/` and the shape below is only
+the shape the mock follows.
+
+**MRR 12-month series** (chart "Monthly revenue"):
+`{ "series": [{ "month": "2025-10", "value": 18200 }, ...] }` with 12 items, oldest first.
+
+**Recent activity**: `{ "items": [{ "type": "BOOKING_CREATED", "at": "2026-09-30T08:58:00Z", ... }] }`
+
+| `type` | Extra fields |
+|---|---|
+| BOOKING_CREATED | `actorName`, `listingTitle`, `bookingCode` |
+| LISTING_AUTO_PUBLISHED | `listingTitle` |
+| PAYMENT_FAILED | `actorName`, `daysLeft` |
+| PLAN_UPGRADED | `actorName`, `planCode` |
+| SUBSCRIPTION_RENEWED | `actorName`, `planCode`, `amount` |
+| LISTING_REPORTED | `listingTitle` |
+
+The web shows "2 min ago" from `at`.
+
+**Export report**: the button downloads a file for the chosen `range`. The mock makes a CSV from the mock data.
 
 ## Current admin and sidebar counts
 
 `GET /api/admin/me` returns `{ "fullName": "Pon Somnang", "roleName": "Super admin" }`
-(`users.full_name` and `admin_roles.name`).
+(`users.full_name` and `admin_roles.name`). When `admin_role_code` is null the backend sends `"roleName": "Admin"`.
 
 `GET /api/admin/nav-counts` returns `{ "flaggedListings": 7, "openCases": 34 }`.
 
 ## Login and MFA (T21)
 
-`POST /api/admin/auth/login` with `{ "email", "password" }` returns `{ "mfaToken" }` and sends an OTP
-(`otp_codes.purpose = ADMIN_MFA`).
+`POST /api/admin/auth/login` with `{ "email", "password" }` returns `{ "mfaToken" }` and sends a 6 digit code by
+EMAIL (`otp_codes.purpose = ADMIN_MFA`).
 
-`POST /api/admin/auth/mfa` with `{ "mfaToken", "code" }` returns `{ "accessToken", "admin": { ... } }`.
-The access token stays in memory only.
+`POST /api/admin/auth/mfa` with `{ "mfaToken", "code" }` returns `{ "accessToken", "admin": { "fullName", "roleName" } }`.
+
+`POST /api/admin/auth/mfa/resend` with `{ "mfaToken" }` sends a new code and returns 204.
+
+Rules:
+
+- The `mfaToken` and the code live 5 minutes (`otp_codes.expires_at`).
+- A wrong code can be tried 5 times. After the 5th wrong try the code is dead. The admin asks for a new code with resend.
+- Resend must be at least 60 seconds after the last code. If sooner: 429 with a `Retry-After` header.
+- There is no password lockout for the MVP.
+- The access token and the `mfaToken` stay in memory only.
+
+| `code` | Status | When |
+|---|---|---|
+| LOGIN_INVALID | 401 | Wrong email or password, or the account is not an admin or is suspended. One message for all, so nobody can check which emails exist. |
+| MFA_INVALID | 401 | Wrong code. `attemptsLeft` says how many tries remain. |
+| MFA_LOCKED | 401 | 5 wrong tries, the code is dead. Ask for a new code. |
+| MFA_EXPIRED | 401 | `mfaToken` or code is older than 5 minutes. Go back to login. |
+| MFA_RESEND_TOO_SOON | 429 | Resend before 60 seconds. |
+
+### Refresh and logout (P2, not built yet)
+
+Until this is built, a page refresh logs the admin out (the access token is only in memory).
+
+- `POST /api/admin/auth/refresh` has no body. It reads the refresh token from an httpOnly, Secure, SameSite cookie
+  (path `/api/admin/auth`) and returns `{ "accessToken", "admin" }`. It sets a new refresh token each time and revokes
+  the old one (`refresh_tokens.revoked_at`). The web calls it when the app opens. If it gives 401 the web goes to `/login`.
+- `POST /api/admin/auth/logout` revokes the refresh token, clears the cookie and returns 204.
+- Web side later: `credentials: 'include'` in `client.js`, try refresh once on a 401, and CORS on the Gateway with
+  `allowCredentials` and the exact web origin.
 
 ## Users (T37)
 
@@ -91,7 +250,7 @@ The access token stays in memory only.
 `role`: TENANT, OWNER, ADMIN. `status`: ACTIVE, SUSPENDED, DELETED.
 
 `PATCH /api/admin/users/{id}/status` with `{ "status": "SUSPENDED", "reason": "..." }` returns the updated user.
-Backend writes one row in `audit_logs`.
+An admin can only set `ACTIVE` or `SUSPENDED`. Any other value gives 400. Backend writes one row in `audit_logs`.
 
 ## Listings (T38)
 
@@ -104,6 +263,7 @@ Backend writes one row in `audit_logs`.
       "id": 31,
       "title": "Studio near AEON Mall",
       "category": "RENTAL",
+      "subcategory": "ROOM",
       "ownerName": "Sok Dara",
       "price": 250,
       "priceUnit": "MONTH",
@@ -117,10 +277,20 @@ Backend writes one row in `audit_logs`.
 }
 ```
 
+`category`: RENTAL, STAY, TRAVEL (from `subcategories.category_id`). `subcategory` is the `subcategories.code` (ROOM, HOTEL, MOTO ...).
 `status`: PENDING_REVIEW, ACTIVE, CHANGES_REQUESTED, REJECTED, PAUSED.
 `flags` values: DUPLICATE_PHOTOS, PRICE_TOO_HIGH, BANNED_PHONE (only flags not yet resolved).
 
 `POST /api/admin/listings/{id}/moderation` with `{ "action": "APPROVE" }` or
-`{ "action": "REQUEST_CHANGES", "reason": "..." }` or `{ "action": "REJECT", "reason": "..." }`.
-Reason is required for REQUEST_CHANGES and REJECT. Returns the updated listing.
+`{ "action": "REQUEST_CHANGES" | "REJECT" | "PAUSE", "reason": "..." }`.
+Reason is required for REQUEST_CHANGES, REJECT and PAUSE. Returns the updated listing.
 Backend writes `moderation_logs` and sends a notification to the owner.
+
+## Open questions
+
+- **nav-counts** needs data from two services (flagged listings from listing-service, open cases from both).
+  Same rule as the Overview: no collecting in the Gateway. How should the sidebar get `openCases`?
+- **Revenue `change`** needs last period's revenue. Without an invoices table or monthly snapshot, the backend can only
+  estimate it from `subscriptions`. It may send `null`.
+- **Owner journey subtitle**: Figma shows a month ("September 2026") but the numbers follow `range`. Ask the designer
+  if the subtitle should show the range.

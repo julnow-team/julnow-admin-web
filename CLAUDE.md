@@ -32,6 +32,13 @@ npm run build    # must pass before a PR
 - Login token: access token in memory, never in localStorage. Theme and language may use localStorage.
 - Follow the existing code style in this repo.
 
+## Code and docs rules
+
+- Code and docs must not look AI-generated. Write like a human developer on this team.
+- Comments: only main comments, short, simple words. No comment on every line.
+- Follow the existing structure, naming and patterns in the repo. Do not add new folders or libraries unless Sopheak agrees.
+- Run `npm run build` and `npm run lint` and report the result before saying a step is done.
+
 ## Figma (file key QlamhDF4p1AZzV0vjGkWVx, page DashBoard 5:119)
 
 Build each screen to match its Figma frame. Screens are 1728 wide: sidebar 260, top bar 64, content padding 32.
@@ -67,5 +74,6 @@ Pong (Neak Pichvothanakpong) works on this repo with Sopheak and is learning Rea
 
 ## Git
 
+- Sopheak creates the branch, commits and pushes. Claude never runs `git commit`, `git push`, `git checkout -b` or any command that changes git history. Claude only edits files.
 - Never commit on main. One task = one branch = one PR, squash merge.
 - Do not add "Co-Authored-By" lines or "Generated with Claude Code" to commit messages or PR descriptions.

@@ -18,6 +18,10 @@ export default {
   'topbar.lightMode': 'ប្ដូរទៅផ្ទៃភ្លឺ',
   'topbar.language': 'ភាសា',
 
+  'common.loading': 'កំពុងផ្ទុក…',
+  'common.error': 'មិនអាចផ្ទុកទិន្នន័យបានទេ សូមព្យាយាមម្តងទៀត។',
+  'common.retry': 'ព្យាយាមម្តងទៀត',
+
   'placeholder.body': 'ទំព័រនេះនឹងបង្កើតក្នុង {task}។',
   'placeholder.later': 'កិច្ចការពេលក្រោយ',
 
@@ -26,4 +30,21 @@ export default {
   'login.email': 'អ៊ីមែល',
   'login.password': 'ពាក្យសម្ងាត់',
   'login.submit': 'ចូល',
+
+  'overview.welcome': 'សូមស្វាគមន៍ត្រឡប់មកវិញ {name}។',
+  'overview.monthlyRevenue': 'ចំណូលប្រចាំខែ',
+  'overview.paidSubscriptions': 'គម្រោងជាវបង់ប្រាក់',
+  'overview.activeListings': 'ទ្រព្យជួលសកម្ម',
+  'overview.totalUsers': 'អ្នកប្រើប្រាស់សរុប',
+  'overview.vsLastMonth': 'ធៀបនឹងខែមុន',
+  'overview.onTrial': '+ {count} កំពុងសាកល្បង',
+  'overview.paymentFailures': 'ការបង់ប្រាក់បរាជ័យ',
+  'overview.lateOwners': 'ម្ចាស់ {count} នាក់យឺតបង់ប្រាក់',
+  'overview.lateOwnersNote': 'មាន ៣ ថ្ងៃដើម្បីបង់ មុនទ្រព្យជួលត្រូវផ្អាក។',
+  'overview.newListings': 'ទ្រព្យជួលថ្មី',
+  'overview.flaggedToday': '{count} ត្រូវបានដាក់ទង់ថ្ងៃនេះ',
+  'overview.flaggedNote': 'ក្នុងចំណោមទ្រព្យជួលថ្មី {total}។',
+  'overview.openCases': 'ករណីហានិភ័យបើកចំហ',
+  'overview.openCasesCount': '{count} ករណីបើកចំហ',
+  'overview.openCasesNote': '{users} ពីអ្នកប្រើ · {system} ពីការត្រួតពិនិត្យប្រព័ន្ធ',
 }

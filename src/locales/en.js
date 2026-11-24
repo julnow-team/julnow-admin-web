@@ -22,6 +22,13 @@ export default {
   'common.error': 'Could not load the data. Please try again.',
   'common.retry': 'Try again',
 
+  'time.justNow': 'Just now',
+  'time.minAgo': '{count} min ago',
+  'time.hourAgo': '{count} hr ago',
+  'time.hoursAgo': '{count} hrs ago',
+  'time.dayAgo': '{count} day ago',
+  'time.daysAgo': '{count} days ago',
+
   'placeholder.body': 'This page is built in {task}.',
   'placeholder.later': 'a later task',
 

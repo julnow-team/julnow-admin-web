@@ -32,6 +32,28 @@
   --color-warning-subtle: var(--color-status-warning-subtle);
   --color-danger: var(--color-status-danger);
   --color-danger-subtle: var(--color-status-danger-subtle);
+
+  --color-series-1: var(--color-data-series-1);
+  --color-series-2: var(--color-data-series-2);
+  --color-series-3: var(--color-data-series-3);
+  --color-series-4: var(--color-data-series-4);
+  --color-series-5: var(--color-data-series-5);
+  --color-grid: var(--color-data-grid);
+
+  --color-rental: var(--color-category-rental);
+  --color-rental-subtle: var(--color-category-rental-subtle);
+  --color-stay: var(--color-category-stay);
+  --color-stay-subtle: var(--color-category-stay-subtle);
+  --color-travel: var(--color-category-travel);
+  --color-travel-subtle: var(--color-category-travel-subtle);
+
+  --shadow-card: var(--effect-shadow-card);
+
+  /* Text sizes from Figma that Tailwind does not have */
+  --text-metric: 28px;
+  --text-metric--line-height: 36px;
+  --text-caption: 13px;
+  --text-caption--line-height: 18px;
 }
 
 @layer base {

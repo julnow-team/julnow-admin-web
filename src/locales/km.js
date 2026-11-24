@@ -22,6 +22,13 @@ export default {
   'common.error': 'មិនអាចផ្ទុកទិន្នន័យបានទេ សូមព្យាយាមម្តងទៀត។',
   'common.retry': 'ព្យាយាមម្តងទៀត',
 
+  'time.justNow': 'ទើបតែ',
+  'time.minAgo': '{count} នាទីមុន',
+  'time.hourAgo': '{count} ម៉ោងមុន',
+  'time.hoursAgo': '{count} ម៉ោងមុន',
+  'time.dayAgo': '{count} ថ្ងៃមុន',
+  'time.daysAgo': '{count} ថ្ងៃមុន',
+
   'placeholder.body': 'ទំព័រនេះនឹងបង្កើតក្នុង {task}។',
   'placeholder.later': 'កិច្ចការពេលក្រោយ',
 

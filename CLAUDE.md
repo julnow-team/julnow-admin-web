@@ -13,7 +13,8 @@ npm run build    # must pass before a PR
 
 ## Folders
 
-- `src/api/` calls to the Gateway. Until the backend APIs exist, these return mock data with the same shape as the real API. Pages never hold mock data.
+- `src/api/` calls to the Gateway. Until the backend APIs exist, these return mock data with the same shape as the real API. Pages never hold mock data. Mock data lives in `src/api/mock/`, switched by `VITE_USE_MOCK`.
+- `docs/api-contract.md` the endpoints and shapes. `docs/TEAM-GUIDE.md` the steps to build a screen. Pages load data with `useApi` (`src/lib/useApi.js`).
 - `src/components/` shared UI. `layout/` has Sidebar, TopBar, AdminLayout.
 - `src/pages/<screen>/` one folder per screen.
 - `src/lib/` helpers: `theme.jsx` (light/dark), `i18n.jsx` (t function).
@@ -63,3 +64,8 @@ Dialogs are in section 1951:14757 (e.g. Suspend 1951:14758).
 5. T50: Overview (KPIs, charts)
 
 Pong (Neak Pichvothanakpong) works on this repo with Sopheak and is learning React. Keep code easy to read.
+
+## Git
+
+- Never commit on main. One task = one branch = one PR, squash merge.
+- Do not add "Co-Authored-By" lines or "Generated with Claude Code" to commit messages or PR descriptions.

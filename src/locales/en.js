@@ -18,6 +18,10 @@ export default {
   'topbar.lightMode': 'Switch to light mode',
   'topbar.language': 'Language',
 
+  'common.loading': 'Loading…',
+  'common.error': 'Could not load the data. Please try again.',
+  'common.retry': 'Try again',
+
   'placeholder.body': 'This page is built in {task}.',
   'placeholder.later': 'a later task',
 
@@ -26,4 +30,21 @@ export default {
   'login.email': 'Email',
   'login.password': 'Password',
   'login.submit': 'Log in',
+
+  'overview.welcome': 'Welcome back, {name}.',
+  'overview.monthlyRevenue': 'Monthly revenue',
+  'overview.paidSubscriptions': 'Paid subscriptions',
+  'overview.activeListings': 'Active listings',
+  'overview.totalUsers': 'Total users',
+  'overview.vsLastMonth': 'vs last month',
+  'overview.onTrial': '+ {count} on trial',
+  'overview.paymentFailures': 'Payment failures',
+  'overview.lateOwners': '{count} owners with late payment',
+  'overview.lateOwnersNote': '3 days to pay before listings pause.',
+  'overview.newListings': 'New listings',
+  'overview.flaggedToday': '{count} flagged today',
+  'overview.flaggedNote': 'Out of {total} new listings.',
+  'overview.openCases': 'Open risk cases',
+  'overview.openCasesCount': '{count} open cases',
+  'overview.openCasesNote': '{users} from users · {system} from system checks',
 }

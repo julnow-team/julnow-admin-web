@@ -37,6 +37,8 @@ export function I18nProvider({ children }) {
   return <I18nContext.Provider value={{ lang, setLang, t }}>{children}</I18nContext.Provider>
 }
 
+// The hook lives next to its provider on purpose
+// eslint-disable-next-line react-refresh/only-export-components
 export function useI18n() {
   return useContext(I18nContext)
 }

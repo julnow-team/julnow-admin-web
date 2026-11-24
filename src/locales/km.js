@@ -54,6 +54,14 @@ export default {
   'monthShort.11': 'វិច្ឆិកា',
   'monthShort.12': 'ធ្នូ',
 
+  'search.clear': 'សម្អាតការស្វែងរក',
+
+  'pagination.label': 'ការបែងចែកទំព័រ',
+  'pagination.summary': 'កំពុងបង្ហាញ {from}–{to} ក្នុងចំណោម {total} {label}',
+  'pagination.previous': 'ទំព័រមុន',
+  'pagination.next': 'ទំព័របន្ទាប់',
+  'pagination.page': 'ទំព័រ {page}',
+
   'placeholder.body': 'ទំព័រនេះនឹងបង្កើតក្នុង {task}។',
   'placeholder.later': 'កិច្ចការពេលក្រោយ',
 

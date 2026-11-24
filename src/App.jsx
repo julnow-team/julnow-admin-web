@@ -1,8 +1,12 @@
+import { lazy, Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import AdminLayout from './components/layout/AdminLayout'
 import LoginPage from './pages/login/LoginPage'
 import PlaceholderPage from './pages/PlaceholderPage'
 import OverviewPage from './pages/overview/OverviewPage'
+
+// The demo page is only for developers. In a production build this line is removed.
+const ComponentsDemo = import.meta.env.DEV ? lazy(() => import('./pages/dev/ComponentsDemo')) : null
 
 export default function App() {
   return (
@@ -16,6 +20,16 @@ export default function App() {
         <Route path="reports" element={<PlaceholderPage titleKey="nav.reports" task="T61" />} />
         <Route path="analytics" element={<PlaceholderPage titleKey="nav.analytics" />} />
         <Route path="settings" element={<PlaceholderPage titleKey="nav.settings" />} />
+        {ComponentsDemo && (
+          <Route
+            path="dev/components"
+            element={
+              <Suspense fallback={null}>
+                <ComponentsDemo />
+              </Suspense>
+            }
+          />
+        )}
       </Route>
     </Routes>
   )

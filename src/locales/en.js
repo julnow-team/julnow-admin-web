@@ -54,6 +54,14 @@ export default {
   'monthShort.11': 'Nov',
   'monthShort.12': 'Dec',
 
+  'search.clear': 'Clear search',
+
+  'pagination.label': 'Pagination',
+  'pagination.summary': 'Showing {from}–{to} of {total} {label}',
+  'pagination.previous': 'Previous page',
+  'pagination.next': 'Next page',
+  'pagination.page': 'Page {page}',
+
   'placeholder.body': 'This page is built in {task}.',
   'placeholder.later': 'a later task',
 

@@ -101,6 +101,7 @@
 
   /* Theme: effects */
   --effect-shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 1px 3px rgb(15 23 42 / 0.06);
+  --effect-shadow-popover: 0 8px 24px -4px rgb(15 23 42 / 0.12);
 
   /* Layout: spacing */
   --space-0: 0;
@@ -169,6 +170,7 @@
   --color-focus-ring: var(--purple-500);
 
   --effect-shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px rgb(0 0 0 / 0.4);
+  --effect-shadow-popover: 0 8px 24px -4px rgb(0 0 0 / 0.5);
 
   --color-category-rental: var(--neutral-300);
   --color-category-rental-subtle: var(--neutral-800);

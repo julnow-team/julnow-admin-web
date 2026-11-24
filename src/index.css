@@ -48,6 +48,7 @@
   --color-travel-subtle: var(--color-category-travel-subtle);
 
   --shadow-card: var(--effect-shadow-card);
+  --shadow-popover: var(--effect-shadow-popover);
 
   /* Text sizes from Figma that Tailwind does not have */
   --text-metric: 28px;

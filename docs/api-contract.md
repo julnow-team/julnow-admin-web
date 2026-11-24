@@ -41,9 +41,9 @@ Priority: P1 = needed for the demo, P2 = after P1, Later = mock only, no real en
 | GET /api/admin/bookings/stats | T50 | P1 | needs update | not started |
 | MRR 12-month series | T50 | Later | todo | no endpoint |
 | Recent activity | T50 | Later | todo | no endpoint |
-| Export report | T50 | Later | todo | no endpoint |
+| Export report | T50 | Later | none, the button is disabled | no endpoint |
 | GET /api/admin/me | T20 | P1 | done (`navigation.js`) | not started |
-| GET /api/admin/nav-counts | T20 | P1 | done (`navigation.js`) | not started (see open questions) |
+| GET /api/admin/nav-counts | T20 | Later | done (`navigation.js`), mock only | no endpoint |
 | POST /api/admin/auth/login | T21 | P1 | todo | not started |
 | POST /api/admin/auth/mfa | T21 | P1 | todo | not started |
 | POST /api/admin/auth/mfa/resend | T21 | P1 | todo | not started |
@@ -68,7 +68,11 @@ The web puts some numbers together itself:
 - Alert cards use the same data: late owners from `subscriptionHealth.lateOwners`, new and flagged listings
   from `submissions`.
 
-`change` is the percent against the period before. If the backend cannot work it out, it sends `null` and the web hides the badge.
+`change` is the percent against the period before. If the backend cannot work it out (for example revenue, there is no
+invoices table yet), it sends `null` and the web hides the badge. Otherwise the web shows the real sign, `+` or `-`.
+
+Subtitles on the page: Subscription health shows the month of `asOf`. Owner journey shows the label of the chosen
+range ("Last 30 days"), not a month.
 
 ### GET /api/admin/auth/stats?range=30d
 
@@ -131,8 +135,8 @@ The web puts some numbers together itself:
       "subcategoryCode": "ROOM",
       "level": "HIGH",
       "flags": [
-        { "type": "DUPLICATE_PHOTOS", "detail": "Same photo as listing JN-47110" },
-        { "type": "PRICE_TOO_HIGH", "detail": "price 43% above area average" }
+        { "type": "DUPLICATE_PHOTOS" },
+        { "type": "PRICE_TOO_HIGH", "percentAboveAverage": 43 }
       ]
     }
   ]
@@ -149,7 +153,10 @@ The web puts some numbers together itself:
 - `riskExceptions`: at most 4 listings with unresolved flags, HIGH first, then newest.
   Only system flags. "Reported by tenant" is not in the API for now (it would need auth data), it stays in the mock only.
 - `level` = HIGH when the listing has 2 or more unresolved flags or has BANNED_PHONE, otherwise MEDIUM.
-- `code` = `JN-` + listing id. `detail` is plain text from the system check, the web shows it as it is.
+- `code` = `JN-` + listing id.
+- Each flag is data, not a sentence. The web writes the sentence with `t()`, the same as Recent activity.
+  Only `PRICE_TOO_HIGH` has an extra field, `percentAboveAverage` (a whole number). `DUPLICATE_PHOTOS` and `BANNED_PHONE` have only `type`.
+  The backend works out the percent when it runs the price check, `listing_flags.detail` is not sent to the web.
 
 ### GET /api/admin/bookings/stats?range=30d
 
@@ -180,14 +187,20 @@ the shape the mock follows.
 
 The web shows "2 min ago" from `at`.
 
-**Export report**: the button downloads a file for the chosen `range`. The mock makes a CSV from the mock data.
+**Reported listing in Risk exceptions**: the mock adds one item with `"level": "REPORTED"` and `"flags": []`
+(a tenant reported the listing). The real endpoint never sends it, because it would need data from auth-service.
+
+**Export report**: the button stays disabled. Later it will download a file for the chosen `range`.
+
+**nav-counts**: `GET /api/admin/nav-counts` (see below) is mock only for now.
 
 ## Current admin and sidebar counts
 
 `GET /api/admin/me` returns `{ "fullName": "Pon Somnang", "roleName": "Super admin" }`
 (`users.full_name` and `admin_roles.name`). When `admin_role_code` is null the backend sends `"roleName": "Admin"`.
 
-`GET /api/admin/nav-counts` returns `{ "flaggedListings": 7, "openCases": 34 }`.
+`GET /api/admin/nav-counts` returns `{ "flaggedListings": 7, "openCases": 34 }`. Mock only (Later): it needs data from
+two services and there is no real endpoint yet.
 
 ## Login and MFA (T21)
 
@@ -285,12 +298,3 @@ An admin can only set `ACTIVE` or `SUSPENDED`. Any other value gives 400. Backen
 `{ "action": "REQUEST_CHANGES" | "REJECT" | "PAUSE", "reason": "..." }`.
 Reason is required for REQUEST_CHANGES, REJECT and PAUSE. Returns the updated listing.
 Backend writes `moderation_logs` and sends a notification to the owner.
-
-## Open questions
-
-- **nav-counts** needs data from two services (flagged listings from listing-service, open cases from both).
-  Same rule as the Overview: no collecting in the Gateway. How should the sidebar get `openCases`?
-- **Revenue `change`** needs last period's revenue. Without an invoices table or monthly snapshot, the backend can only
-  estimate it from `subscriptions`. It may send `null`.
-- **Owner journey subtitle**: Figma shows a month ("September 2026") but the numbers follow `range`. Ask the designer
-  if the subtitle should show the range.

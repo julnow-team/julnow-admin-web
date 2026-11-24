@@ -39,7 +39,7 @@ npm run build    # must pass before a PR
 - Follow the existing structure, naming and patterns in the repo. Do not add new folders or libraries unless Sopheak agrees.
 - Run `npm run build` and `npm run lint` and report the result before saying a step is done.
 
-## Figma (file key QlamhDF4p1AZzV0vjGkWVx, page DashBoard 5:119)
+## Figma (file key uUcxCTURdJGi4X444NZ8Dp, page DashBoard 5:119)
 
 Build each screen to match its Figma frame. Screens are 1728 wide: sidebar 260, top bar 64, content padding 32.
 

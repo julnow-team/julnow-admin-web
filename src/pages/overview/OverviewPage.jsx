@@ -1,82 +1,82 @@
-import { CreditCard, DollarSign, Flag, House, Shield, Users } from 'lucide-react'
+import { useState } from 'react'
 import { getCurrentAdmin } from '../../api/navigation'
-import { getOverview } from '../../api/overview'
-import AlertCard from '../../components/AlertCard'
-import KpiCard from '../../components/KpiCard'
+import {
+  getAuthStats,
+  getBookingStats,
+  getListingStats,
+  getRecentActivity,
+  getRevenueSeries,
+} from '../../api/overview'
+import Button from '../../components/Button'
 import PageHeader from '../../components/PageHeader'
-import PageStatus from '../../components/PageStatus'
+import Select from '../../components/Select'
 import { useI18n } from '../../lib/i18n'
 import { useApi } from '../../lib/useApi'
+import AlertRow from './AlertRow'
+import KpiRow from './KpiRow'
+import OwnerJourney from './OwnerJourney'
+import RecentActivity from './RecentActivity'
+import RevenueChart from './RevenueChart'
+import RiskExceptions from './RiskExceptions'
+import Submissions from './Submissions'
+import SubscriptionHealth from './SubscriptionHealth'
 
-const number = (value) => value.toLocaleString('en-US')
+const RANGES = ['7d', '30d', '90d']
 
 export default function OverviewPage() {
   const { t } = useI18n()
-  const { data: overview, error, reload } = useApi(getOverview)
+  const [range, setRange] = useState('30d')
+
+  // Each service has its own call, so one failing service only breaks its own sections
+  const auth = useApi(getAuthStats, { range })
+  const listings = useApi(getListingStats, { range })
+  const bookings = useApi(getBookingStats, { range })
+  const series = useApi(getRevenueSeries)
+  const activity = useApi(getRecentActivity)
   const { data: admin } = useApi(getCurrentAdmin)
 
-  if (!overview) return <PageStatus error={error} onRetry={reload} />
-
-  const { monthlyRevenue, paidSubscriptions, activeListings, totalUsers, attention } = overview
-  const vsLastMonth = t('overview.vsLastMonth')
+  const actions = (
+    <>
+      <Select
+        value={range}
+        onChange={setRange}
+        label={t('overview.rangeLabel')}
+        options={RANGES.map((value) => ({ value, label: t(`overview.range.${value}`) }))}
+      />
+      <span title={t('overview.exportSoon')}>
+        <Button disabled aria-label={`${t('overview.export')}. ${t('overview.exportSoon')}`}>
+          {t('overview.export')}
+        </Button>
+      </span>
+    </>
+  )
 
   return (
     <>
-      <PageHeader title={t('nav.overview')} subtitle={t('overview.welcome', { name: admin?.fullName })} />
+      <PageHeader
+        title={t('nav.overview')}
+        subtitle={t('overview.welcome', { name: admin?.fullName })}
+        actions={actions}
+      />
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <KpiCard
-          label={t('overview.monthlyRevenue')}
-          value={`$${number(monthlyRevenue.value)}`}
-          icon={DollarSign}
-          change={monthlyRevenue.change}
-          note={vsLastMonth}
-        />
-        <KpiCard
-          label={t('overview.paidSubscriptions')}
-          value={number(paidSubscriptions.value)}
-          icon={CreditCard}
-          change={paidSubscriptions.change}
-          note={`${vsLastMonth} ${t('overview.onTrial', { count: paidSubscriptions.onTrial })}`}
-        />
-        <KpiCard
-          label={t('overview.activeListings')}
-          value={number(activeListings.value)}
-          icon={House}
-          change={activeListings.change}
-          note={vsLastMonth}
-        />
-        <KpiCard
-          label={t('overview.totalUsers')}
-          value={number(totalUsers.value)}
-          icon={Users}
-          change={totalUsers.change}
-          note={vsLastMonth}
-        />
-      </div>
+      <div className="flex flex-col gap-6">
+        <KpiRow auth={auth} listings={listings} />
+        <AlertRow auth={auth} listings={listings} />
 
-      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-3">
-        <AlertCard
-          tone="warning"
-          icon={CreditCard}
-          label={t('overview.paymentFailures')}
-          title={t('overview.lateOwners', { count: attention.lateOwners })}
-          note={t('overview.lateOwnersNote')}
-        />
-        <AlertCard
-          tone="info"
-          icon={Flag}
-          label={t('overview.newListings')}
-          title={t('overview.flaggedToday', { count: attention.flaggedToday })}
-          note={t('overview.flaggedNote', { total: attention.newToday })}
-        />
-        <AlertCard
-          tone="danger"
-          icon={Shield}
-          label={t('overview.openCases')}
-          title={t('overview.openCasesCount', { count: attention.openCases })}
-          note={t('overview.openCasesNote', { users: attention.casesFromUsers, system: attention.casesFromSystem })}
-        />
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <SubscriptionHealth auth={auth} listings={listings} />
+          <Submissions listings={listings} />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <RevenueChart auth={auth} series={series} />
+          <OwnerJourney auth={auth} listings={listings} bookings={bookings} range={range} />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <RiskExceptions auth={auth} listings={listings} />
+          <RecentActivity activity={activity} />
+        </div>
       </div>
     </>
   )

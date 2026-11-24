@@ -14,10 +14,18 @@ export function formatChange(value) {
   return `${value > 0 ? '+' : ''}${text}%`
 }
 
-// "2026-09-30T09:00:00Z" -> "September 2026" (or the Khmer month name)
-export function formatMonth(iso, lang) {
-  const locale = lang === 'km' ? 'km-KH-u-nu-latn' : 'en-US'
-  return new Date(iso).toLocaleDateString(locale, { month: 'long', year: 'numeric' })
+// Month names come from the locale files, because some browsers have no Khmer data for Intl.
+// Pass the t function from useI18n.
+
+// "2026-09-30T09:00:00Z" -> "September 2026" (or "កញ្ញា 2026")
+export function formatMonth(iso, t) {
+  const date = new Date(iso)
+  return `${t(`month.${date.getUTCMonth() + 1}`)} ${date.getUTCFullYear()}`
+}
+
+// "2025-10" -> "Oct"
+export function formatMonthShort(iso, t) {
+  return t(`monthShort.${new Date(iso).getUTCMonth() + 1}`)
 }
 
 // "2 min ago", "1 hr ago", "3 hrs ago", "2 days ago". Pass the t function from useI18n.

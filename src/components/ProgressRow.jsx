@@ -15,7 +15,14 @@ export default function ProgressRow({ label, value, percent, fill, tone }) {
         <span className="text-sm font-semibold text-ink">{value}</span>
         <span className="w-9 text-right text-caption text-muted">{percent == null ? '—' : `${Math.round(percent)}%`}</span>
       </div>
-      <div className="h-1.5 overflow-hidden rounded-full bg-subtle">
+      <div
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(fill)}
+        className="h-1.5 overflow-hidden rounded-full bg-subtle"
+      >
         <div className={`h-full rounded-full ${TONES[tone]}`} style={{ width: `${fill}%` }} />
       </div>
     </div>

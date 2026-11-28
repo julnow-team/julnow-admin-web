@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { getCurrentAdmin } from '../../api/navigation'
 import {
   getAuthStats,
   getBookingStats,
@@ -10,6 +9,7 @@ import {
 import Button from '../../components/Button'
 import PageHeader from '../../components/PageHeader'
 import Select from '../../components/Select'
+import { useAuth } from '../../lib/auth'
 import { useI18n } from '../../lib/i18n'
 import { useApi } from '../../lib/useApi'
 import AlertRow from './AlertRow'
@@ -33,7 +33,7 @@ export default function OverviewPage() {
   const bookings = useApi(getBookingStats, { range })
   const series = useApi(getRevenueSeries)
   const activity = useApi(getRecentActivity)
-  const { data: admin } = useApi(getCurrentAdmin)
+  const { admin } = useAuth()
 
   const actions = (
     <>
@@ -55,7 +55,7 @@ export default function OverviewPage() {
     <>
       <PageHeader
         title={t('nav.overview')}
-        subtitle={t('overview.welcome', { name: admin?.fullName })}
+        subtitle={t('overview.welcome', { name: admin.fullName })}
         actions={actions}
       />
 

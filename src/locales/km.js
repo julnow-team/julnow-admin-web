@@ -79,6 +79,20 @@ export default {
   'login.email': 'អ៊ីមែល',
   'login.password': 'ពាក្យសម្ងាត់',
   'login.submit': 'ចូល',
+  'login.error.invalid': 'អ៊ីមែល ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ។',
+
+  'mfa.title': 'បញ្ជាក់អត្តសញ្ញាណរបស់អ្នក',
+  'mfa.code': 'កូដផ្ទៀងផ្ទាត់',
+  'mfa.verify': 'ផ្ទៀងផ្ទាត់',
+  'mfa.resend': 'ផ្ញើកូដម្តងទៀត',
+  'mfa.back': 'ត្រឡប់ទៅចូលគណនី',
+  'mfa.error.invalid': 'កូដមិនត្រឹមត្រូវទេ។ នៅសល់ {count} ដងទៀត។',
+  'mfa.error.locked': 'បានបញ្ចូលកូដខុសច្រើនដងពេក។ សូមស្នើកូដថ្មី។',
+  'mfa.error.expired': 'កូដនេះផុតកំណត់ហើយ។ សូមចូលគណនីម្តងទៀត។',
+  'mfa.error.resendTooSoon': 'សូមរង់ចាំ {seconds} វិនាទី មុនស្នើកូដថ្មី។',
+
+  'error.network': 'មិនអាចទាក់ទងម៉ាស៊ីនបម្រើបានទេ។ សូមព្យាយាមម្តងទៀត។',
+  'error.unknown': 'មានបញ្ហាកើតឡើង។ សូមព្យាយាមម្តងទៀត។',
 
   'overview.welcome': 'សូមស្វាគមន៍ត្រឡប់មកវិញ {name}។',
   'overview.monthlyRevenue': 'ចំណូលប្រចាំខែ',

@@ -38,6 +38,33 @@ page  ->  useApi(getUsers, filters)  ->  src/api/users.js  ->  mock  or  Gateway
 - Comments: only short and simple, where the code is not obvious.
 - Keep a page small. If it grows past about 150 lines, move a part into its own component.
 
+## Login in mock mode
+
+The admin pages need a login. In mock mode (`VITE_USE_MOCK=true`) use these test accounts.
+They all use the password `Admin@123`.
+
+| Email | What happens |
+|---|---|
+| `admin@julnow.com` | Works. After the password, type the code `123456`. |
+| `expired@julnow.com` | The password works, but the code is always "expired". |
+| `network@julnow.com` | The login call fails like a lost connection. |
+| any other email, or a wrong password | "Wrong email or password" |
+
+Cases to try on the code screen (use `admin@julnow.com`):
+
+| Do this | You get |
+|---|---|
+| Type a wrong code | "Tries left": 4, then 3, 2, 1 |
+| A 5th wrong code | The code is dead (locked). Even `123456` is refused. |
+| Ask for a new code at once | "Please wait N seconds" (you must wait 60 seconds) |
+| Ask for a new code after 60 seconds | A new code and a new 5 minutes. The wrong tries start from zero. |
+| Open `/users` before you log in | You go to the login, and after the code you come back to `/users`. |
+
+Where the data lives: the code is `src/api/mock/auth.js`. The login is only in memory, so a reload logs you out.
+To save you from logging in again after every reload, `npm run dev` keeps the login in `sessionStorage` (this tab only,
+see `src/lib/devSession.js`). It is not in a production build. To test the login screens, set
+`VITE_DEV_KEEP_SESSION=false` in `.env.local` and restart `npm run dev`.
+
 ## When the backend is ready
 
 1. Set `VITE_USE_MOCK=false` in `.env.local`, start the Gateway and open the page.

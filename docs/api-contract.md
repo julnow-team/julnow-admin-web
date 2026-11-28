@@ -44,9 +44,9 @@ Priority: P1 = needed for the demo, P2 = after P1, Later = mock only, no real en
 | Export report | T50 | Later | none, the button is disabled | no endpoint |
 | GET /api/admin/me | T20 | P1 | done (`navigation.js`) | not started |
 | GET /api/admin/nav-counts | T20 | Later | done (`navigation.js`), mock only | no endpoint |
-| POST /api/admin/auth/login | T21 | P1 | todo | not started |
-| POST /api/admin/auth/mfa | T21 | P1 | todo | not started |
-| POST /api/admin/auth/mfa/resend | T21 | P1 | todo | not started |
+| POST /api/admin/auth/login | T21 | P1 | done | not started |
+| POST /api/admin/auth/mfa | T21 | P1 | done | not started |
+| POST /api/admin/auth/mfa/resend | T21 | P1 | done | not started |
 | POST /api/admin/auth/refresh | T21 | P2 | not built | not started |
 | POST /api/admin/auth/logout | T21 | P2 | not built | not started |
 | GET /api/admin/users | T37 | P1 | todo | not started |
@@ -204,20 +204,32 @@ two services and there is no real endpoint yet.
 
 ## Login and MFA (T21)
 
-`POST /api/admin/auth/login` with `{ "email", "password" }` returns `{ "mfaToken" }` and sends a 6 digit code by
-EMAIL (`otp_codes.purpose = ADMIN_MFA`).
+`POST /api/admin/auth/login` with `{ "email", "password" }` sends a 6 digit code by EMAIL
+(`otp_codes.purpose = ADMIN_MFA`) and returns:
+
+```json
+{ "mfaToken": "…", "expiresIn": 300, "resendAfter": 60 }
+```
+
+`expiresIn` is how many seconds the `mfaToken` and the code live. `resendAfter` is how many seconds the admin must
+wait before asking for a new code. The web shows both countdowns from these numbers.
 
 `POST /api/admin/auth/mfa` with `{ "mfaToken", "code" }` returns `{ "accessToken", "admin": { "fullName", "roleName" } }`.
 
-`POST /api/admin/auth/mfa/resend` with `{ "mfaToken" }` sends a new code and returns 204.
+`POST /api/admin/auth/mfa/resend` with `{ "mfaToken" }` returns `{ "expiresIn": 300, "resendAfter": 60 }`.
+It sends a **new code** and gives **a new 5 minutes**: the same `mfaToken` is valid for 5 more minutes, and the wrong
+tries start from zero again.
 
 Rules:
 
-- The `mfaToken` and the code live 5 minutes (`otp_codes.expires_at`).
+- The `mfaToken` and the code live 5 minutes (`expiresIn`, `otp_codes.expires_at`).
 - A wrong code can be tried 5 times. After the 5th wrong try the code is dead. The admin asks for a new code with resend.
-- Resend must be at least 60 seconds after the last code. If sooner: 429 with a `Retry-After` header.
+- Resend must be at least 60 seconds after the last code (`resendAfter`). If sooner: 429 with a `Retry-After` header
+  (seconds).
 - There is no password lockout for the MVP.
 - The access token and the `mfaToken` stay in memory only.
+- A request that carries a token and gets 401 ends the session, the web goes to `/login`. A 401 from login or mfa
+  (wrong password or code) does not.
 
 | `code` | Status | When |
 |---|---|---|
@@ -226,6 +238,8 @@ Rules:
 | MFA_LOCKED | 401 | 5 wrong tries, the code is dead. Ask for a new code. |
 | MFA_EXPIRED | 401 | `mfaToken` or code is older than 5 minutes. Go back to login. |
 | MFA_RESEND_TOO_SOON | 429 | Resend before 60 seconds. |
+| TOKEN_EXPIRED | 401 | P2: the access token ran out, the web asks for a new one with refresh. Not used yet. |
+| NETWORK | none | Not from the server. The web uses it when it cannot reach the Gateway. |
 
 ### Refresh and logout (P2, not built yet)
 

@@ -1,8 +1,8 @@
 import { NavLink } from 'react-router-dom'
 import { ChartNoAxesColumn, CreditCard, House, LayoutGrid, LogOut, Settings, Shield, Users } from 'lucide-react'
-import logo from '../../assets/logo.png'
 import { useI18n } from '../../lib/i18n'
 import Avatar from '../Avatar'
+import Logo from '../Logo'
 
 const MAIN_ITEMS = [
   { to: '/', labelKey: 'nav.overview', icon: LayoutGrid, end: true },
@@ -48,14 +48,7 @@ export default function Sidebar({ counts, admin, onLogout }) {
   return (
     <aside className="sticky top-0 flex h-screen w-[260px] shrink-0 flex-col gap-1 border-r border-line bg-surface px-4 py-5">
       <div className="flex items-center gap-2 px-2 pt-1 pb-5">
-        <div className="relative h-[69px] w-[124px] overflow-hidden">
-          <img
-            src={logo}
-            alt="JulNow"
-            className="logo absolute max-w-none"
-            style={{ width: '142.27%', height: '255.56%', left: '-20.62%', top: '-81.48%' }}
-          />
-        </div>
+        <Logo />
         <span className="whitespace-nowrap rounded-sm bg-subtle px-2 py-0.5 text-xs font-medium text-ink-soft">{t('app.badge')}</span>
       </div>
 

@@ -79,6 +79,20 @@ export default {
   'login.email': 'Email',
   'login.password': 'Password',
   'login.submit': 'Log in',
+  'login.error.invalid': 'Wrong email or password.',
+
+  'mfa.title': 'Verify your identity',
+  'mfa.code': 'Verification code',
+  'mfa.verify': 'Verify',
+  'mfa.resend': 'Resend code',
+  'mfa.back': 'Back to Log in',
+  'mfa.error.invalid': 'That code is not right. {count} tries left.',
+  'mfa.error.locked': 'Too many wrong codes. Ask for a new code.',
+  'mfa.error.expired': 'This code has expired. Log in again.',
+  'mfa.error.resendTooSoon': 'Please wait {seconds} seconds before you ask for a new code.',
+
+  'error.network': 'Could not reach the server. Please try again.',
+  'error.unknown': 'Something went wrong. Please try again.',
 
   'overview.welcome': 'Welcome back, {name}.',
   'overview.monthlyRevenue': 'Monthly revenue',

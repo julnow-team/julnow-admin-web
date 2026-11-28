@@ -89,8 +89,8 @@ export default function MfaPage() {
           <Mail size={20} />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-ink-soft">{t('mfa.method')}</p>
-          <p className="text-xs font-medium tracking-[0.01em] text-ink-soft">
+          <p className="text-sm font-semibold break-words text-ink-soft">{t('mfa.method')}</p>
+          <p className="text-xs font-medium tracking-[0.01em] break-words text-ink-soft">
             {t('mfa.sentTo', { email: maskEmail(pendingMfa.email) })}
           </p>
         </div>

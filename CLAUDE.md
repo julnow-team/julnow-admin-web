@@ -46,6 +46,9 @@ Build each screen from its Figma frame. Screens are 1728 wide: sidebar 260, top 
 Figma is the guide for layout, structure and what each screen contains, not a strict rule.
 
 - Khmer text is not in Figma. Write natural, easy Khmer yourself.
+  Khmer text must be short, simple and easy to understand. Buttons and labels: 1-3 words.
+  Messages: one short sentence. No long formal phrases. If English is short, Khmer must be short too.
+  Use "បង្ហោះ" for publish.
 - Colours: use our tokens and keep colours few and consistent across the app. If Figma uses too many colours or is inconsistent, simplify and tell Sopheak.
 - If Figma does not fit the business rules, propose a change with the reason.
 

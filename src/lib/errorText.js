@@ -12,6 +12,12 @@ export function errorText(error, t) {
       return t('mfa.error.expired')
     case 'MFA_RESEND_TOO_SOON':
       return t('mfa.error.resendTooSoon', { seconds: error.retryAfter })
+    case 'REASON_REQUIRED':
+      return t('users.error.reasonRequired')
+    case 'FORBIDDEN':
+      return t('users.error.forbidden')
+    case 'USER_NOT_FOUND':
+      return t('users.error.notFound')
     case 'NETWORK':
       return t('error.network')
     default:

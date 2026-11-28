@@ -1,5 +1,6 @@
 import Card from '../../components/Card'
 import Pagination from '../../components/Pagination'
+import RowActions from '../../components/RowActions'
 import SearchField from '../../components/SearchField'
 import SegmentedControl from '../../components/SegmentedControl'
 import Select from '../../components/Select'
@@ -11,7 +12,7 @@ import { BILLINGS, PLANS, ROLES, STATUSES, TRUSTS } from './useUserFilters'
 
 export const PAGE_SIZE = 10
 
-export default function UsersTable({ users, stats, filters, search, onSearch, onFilter, onPage, onReset }) {
+export default function UsersTable({ users, stats, filters, search, onSearch, onFilter, onPage, onReset, onView, onStatus }) {
   const { t } = useI18n()
 
   // The tab counts are for all users, they do not follow the other filters
@@ -45,6 +46,14 @@ export default function UsersTable({ users, stats, filters, search, onSearch, on
     )
   }
 
+  // Admins are not suspended from this screen, they only have View details
+  function rowItems(user) {
+    const items = [{ label: t('users.view'), onClick: () => onView(user) }]
+    if (user.role === 'ADMIN') return items
+    if (user.status === 'SUSPENDED') return [...items, { label: t('users.reactivate'), onClick: () => onStatus(user, 'ACTIVE') }]
+    return [...items, { label: t('users.suspend'), onClick: () => onStatus(user, 'SUSPENDED') }]
+  }
+
   const columns = [
     { key: 'user', header: t('users.col.user'), render: (user) => <UserCell user={user} /> },
     { key: 'role', header: t('users.col.role'), width: 110, render: (user) => t(`users.role.${user.role}`) },
@@ -62,6 +71,14 @@ export default function UsersTable({ users, stats, filters, search, onSearch, on
       header: t('users.col.joined'),
       width: 130,
       render: (user) => <span className="whitespace-nowrap">{formatDate(user.createdAt, t)}</span>,
+    },
+    {
+      key: 'actions',
+      header: t('users.col.actions'),
+      hideHeader: true,
+      align: 'right',
+      width: 64,
+      render: (user) => <RowActions label={t('users.rowActionsFor', { name: user.fullName })} items={rowItems(user)} />,
     },
   ]
 

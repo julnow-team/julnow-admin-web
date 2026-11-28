@@ -256,4 +256,18 @@ export default {
   'users.suspend': 'Suspend',
   'users.reactivate': 'Reactivate',
   'users.emptyTitle': 'No users found',
+
+  'users.rowActionsFor': 'Actions for {name}',
+  'users.suspendTitle': 'Suspend {name}?',
+  'users.suspendMessage': 'This user will not be able to log in until you reactivate the account.',
+  'users.reasonLabel': 'Reason',
+  'users.reasonPlaceholder': 'Why is this account suspended?',
+  'users.reactivateTitle': 'Reactivate {name}?',
+  'users.reactivateMessage': 'This user will be able to log in again.',
+  'users.error.reasonRequired': 'Please write a reason.',
+  'users.error.forbidden': 'Admin accounts cannot be suspended here.',
+  'users.error.notFound': 'This user no longer exists.',
+  'users.detail.phone': 'Phone',
+  'users.detail.lastLogin': 'Last login',
+  'users.detail.never': 'Never',
 }

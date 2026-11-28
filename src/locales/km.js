@@ -256,4 +256,18 @@ export default {
   'users.suspend': 'ផ្អាកគណនី',
   'users.reactivate': 'បើកគណនីឡើងវិញ',
   'users.emptyTitle': 'រកមិនឃើញអ្នកប្រើប្រាស់',
+
+  'users.rowActionsFor': 'សកម្មភាពសម្រាប់ {name}',
+  'users.suspendTitle': 'ផ្អាកគណនី {name}?',
+  'users.suspendMessage': 'អ្នកប្រើនេះនឹងចូលគណនីមិនបាន រហូតដល់អ្នកបើកគណនីឡើងវិញ។',
+  'users.reasonLabel': 'មូលហេតុ',
+  'users.reasonPlaceholder': 'ហេតុអ្វីបានជាផ្អាកគណនីនេះ?',
+  'users.reactivateTitle': 'បើកគណនី {name} ឡើងវិញ?',
+  'users.reactivateMessage': 'អ្នកប្រើនេះនឹងអាចចូលគណនីបានម្តងទៀត។',
+  'users.error.reasonRequired': 'សូមសរសេរមូលហេតុ។',
+  'users.error.forbidden': 'មិនអាចផ្អាកគណនីអ្នកគ្រប់គ្រងនៅទីនេះបានទេ។',
+  'users.error.notFound': 'រកមិនឃើញអ្នកប្រើនេះទៀតទេ។',
+  'users.detail.phone': 'ទូរស័ព្ទ',
+  'users.detail.lastLogin': 'ចូលចុងក្រោយ',
+  'users.detail.never': 'មិនធ្លាប់ចូល',
 }

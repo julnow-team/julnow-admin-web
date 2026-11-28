@@ -435,6 +435,13 @@ trial are not carried over.
 - If the owner already has a PENDING invoice, the backend uses it. When its QR has expired it makes a new QR on the same
   invoice. If the owner picked a different plan, the invoice gets the new `plan_code` and `amount` and a new QR.
   So there is never more than one PENDING invoice, and an expired QR never makes a new invoice.
+- **A new QR replaces the old one (expired or plan change): the backend closes the old PayWay transaction first**, with the
+  old `payway_tran_id`, so the old QR cannot be paid. Then it makes the new transaction. Order:
+  1. Ask PayWay for the old transaction. If it was already paid, handle it like a callback (see below) and stop.
+  2. Close the old transaction. If PayWay cannot close it, no new QR is made, the answer is 502 `PAYMENT_UNAVAILABLE`.
+  3. Only then save the new `payway_tran_id`, `qr_string` and `qr_expires_at` on the invoice.
+- `tran_id` starts with `JN<invoiceId>-` and ends with a short unique text (PayWay allows 20 characters at most).
+  The backend reads the invoice id from it, so a callback for an old `tran_id` still finds its invoice.
 - `amount` is `plans.price_monthly` at that moment. The app draws the QR image from `qrString`.
 - Errors: 400 `PLAN_INVALID`, 409 `ALREADY_SUBSCRIBED` (the same plan is ACTIVE and not near its end), 502 `PAYMENT_UNAVAILABLE`
   (PayWay did not answer).
@@ -449,6 +456,12 @@ trial are not carried over.
   "check transaction" with the secret keys, and only a confirmed success marks the invoice PAID.
 - It is safe to call many times (PayWay may send the same callback again): only a PENDING invoice changes, the rest returns 200 and does nothing.
 - Unknown `tran_id` returns 404, nothing changes.
+- **The callback checks the amount.** The money PayWay confirms must equal `invoices.amount`, and the `tran_id` must be the
+  invoice's current `payway_tran_id`. If PayWay reports a payment for an old `tran_id` (a QR that was replaced) or the amount is
+  different, the backend does **not** activate the subscription and does not change the invoice status. It writes the reason
+  in `invoices.review_note` (for example `OLD_TRAN_ID` or `AMOUNT_MISMATCH 25.00 / 29.00`) and answers 200.
+  An admin looks at it and refunds or fixes it by hand. There is no admin screen for this yet, the invoices with a
+  `review_note` are found with a query.
 - Declined or cancelled payment: invoice FAILED. A QR that is only expired stays PENDING, the owner asks for a new QR on the same invoice.
 - PayWay needs a public HTTPS address for the callback. In the sandbox on a laptop use a tunnel. The PayWay `merchant_id` and
   keys are in the backend environment, never in the repo and never in the web or the app.
@@ -474,6 +487,7 @@ One new migration file in auth-service (never edit an old one). The `invoices` t
 | invoices | `qr_string TEXT` | The KHQR text, so the app can show the same QR again. |
 | invoices | `qr_expires_at TIMESTAMPTZ` | When the QR stops working. |
 | invoices | `payway_ref VARCHAR(50)` | The approval code PayWay returns when paid. For support and refunds. |
+| invoices | `review_note VARCHAR(255)` | Not empty = a payment that needs an admin (old QR paid, or wrong amount). See the callback rules. |
 | invoices | `CREATE UNIQUE INDEX ... ON invoices (subscription_id) WHERE status = 'PENDING'` | At most one open invoice per subscription (no double charge). |
 
 `paid_at`, `amount`, `status`, `attempt_count`, `period_start` and `period_end` already exist. `subscriptions` has everything

@@ -102,6 +102,15 @@
   /* Theme: effects */
   --effect-shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 1px 3px rgb(15 23 42 / 0.06);
   --effect-shadow-popover: 0 8px 24px -4px rgb(15 23 42 / 0.12);
+  --effect-shadow-dialog: 0 8px 32px rgb(15 23 42 / 0.16);
+  --effect-shadow-drawer: -8px 0 32px rgb(15 23 42 / 0.16);
+
+  /* Theme: overlay behind a dialog or drawer */
+  --color-bg-overlay: rgb(2 6 23 / 0.72);
+
+  /* Theme: segmented control (the picked option is lighter than the track in both themes) */
+  --color-segment-track: var(--neutral-100);
+  --color-segment-thumb: var(--neutral-0);
 
   /* Layout: spacing */
   --space-0: 0;
@@ -171,6 +180,13 @@
 
   --effect-shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px rgb(0 0 0 / 0.4);
   --effect-shadow-popover: 0 8px 24px -4px rgb(0 0 0 / 0.5);
+  --effect-shadow-dialog: 0 8px 32px rgb(0 0 0 / 0.5);
+  --effect-shadow-drawer: -8px 0 32px rgb(0 0 0 / 0.5);
+
+  --color-bg-overlay: rgb(2 6 23 / 0.8);
+
+  --color-segment-track: var(--neutral-900);
+  --color-segment-thumb: var(--neutral-700);
 
   --color-category-rental: var(--neutral-300);
   --color-category-rental-subtle: var(--neutral-800);

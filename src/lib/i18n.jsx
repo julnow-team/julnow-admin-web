@@ -16,6 +16,12 @@ function readSavedLang() {
   return 'en'
 }
 
+// A page can add its own text here. The dev components page uses it so its text is not in the production build.
+// eslint-disable-next-line react-refresh/only-export-components
+export function addMessages(lang, messages) {
+  Object.assign(DICTIONARIES[lang], messages)
+}
+
 export function I18nProvider({ children }) {
   const [lang, setLang] = useState(readSavedLang)
 

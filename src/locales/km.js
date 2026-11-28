@@ -21,6 +21,8 @@ export default {
   'common.loading': 'កំពុងផ្ទុក…',
   'common.error': 'មិនអាចផ្ទុកទិន្នន័យបានទេ សូមព្យាយាមម្តងទៀត។',
   'common.retry': 'ព្យាយាមម្តងទៀត',
+  'common.cancel': 'បោះបង់',
+  'common.close': 'បិទ',
 
   'time.justNow': 'ទើបតែ',
   'time.minAgo': '{count} នាទីមុន',

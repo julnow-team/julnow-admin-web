@@ -21,6 +21,8 @@ export default {
   'common.loading': 'Loading…',
   'common.error': 'Could not load the data. Please try again.',
   'common.retry': 'Try again',
+  'common.cancel': 'Cancel',
+  'common.close': 'Close',
 
   'time.justNow': 'Just now',
   'time.minAgo': '{count} min ago',

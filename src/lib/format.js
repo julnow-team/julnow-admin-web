@@ -28,6 +28,21 @@ export function formatMonthShort(iso, t) {
   return t(`monthShort.${new Date(iso).getUTCMonth() + 1}`)
 }
 
+// "2025-03-12T10:00:00Z" -> "Mar 12, 2025" (Khmer: "12 មីនា 2025"). The order comes from the date.format text.
+export function formatDate(iso, t) {
+  const date = new Date(iso)
+  return t('date.format', {
+    month: t(`monthShort.${date.getUTCMonth() + 1}`),
+    day: date.getUTCDate(),
+    year: date.getUTCFullYear(),
+  })
+}
+
+// Whole days from now until iso, never below 0
+export function daysLeft(iso) {
+  return Math.max(0, Math.ceil((new Date(iso).getTime() - Date.now()) / 86400000))
+}
+
 // "2 min ago", "1 hr ago", "3 hrs ago", "2 days ago". Pass the t function from useI18n.
 export function timeAgo(iso, t) {
   const minutes = Math.floor((Date.now() - new Date(iso).getTime()) / 60000)

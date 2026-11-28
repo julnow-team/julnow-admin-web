@@ -50,9 +50,9 @@ Priority: P1 = needed for the demo, P2 = after P1, Later = mock only, no real en
 | POST /api/admin/auth/mfa/resend | T21 | P1 | done | not started |
 | POST /api/admin/auth/refresh | T21 | P2 | not built | not started |
 | POST /api/admin/auth/logout | T21 | P2 | not built | not started |
-| GET /api/admin/users | T37 | P1 | todo | not started |
-| GET /api/admin/users/stats | T37 | P1 | todo | not started |
-| PATCH /api/admin/users/{id}/status | T37 | P1 | todo | not started |
+| GET /api/admin/users | T37 | P1 | done | not started |
+| GET /api/admin/users/stats | T37 | P1 | done | not started |
+| PATCH /api/admin/users/{id}/status | T37 | P1 | done | not started |
 | GET /api/admin/listings | T38 | P1 | todo | not started |
 | POST /api/admin/listings/{id}/moderation | T38 | P1 | todo | not started |
 | POST /api/subscriptions/checkout | mobile | P1 | none (not the admin web) | not started |
@@ -261,7 +261,7 @@ Until this is built, a page refresh logs the admin out (the access token is only
 
 Both endpoints are in auth-service. The list leaves out users with status DELETED.
 
-### GET /api/admin/users?page=0&size=10&q=sok&role=OWNER&status=ACTIVE&trust=VERIFIED&plan=PRO
+### GET /api/admin/users?page=0&size=10&q=sok&role=OWNER&status=ACTIVE&trust=VERIFIED&plan=PRO&billing=PAST_DUE
 
 ```json
 {
@@ -293,6 +293,7 @@ Newest first (`created_at` descending).
 | `status` | ACTIVE, SUSPENDED | `users.status` |
 | `trust` | VERIFIED, FLAGGED, UNVERIFIED | the `trust` rule below |
 | `plan` | TRIAL, STARTER, PRO, NONE | `plan.code`. `NONE` = users without a subscription |
+| `billing` | PAID, UNPAID, PAST_DUE, FAILED | the `billing` value below. Users with `billing: null` are never in the result |
 
 Fields:
 
@@ -307,6 +308,8 @@ Fields:
   - `code` is `subscriptions.plan_code`, `name` is `plans.name`, `status` is `subscriptions.status`
     (TRIALING, ACTIVE, PAST_DUE, CANCELLED, EXPIRED), `endsAt` is `current_period_end`, `graceUntil` is `grace_until`
     (only PAST_DUE has it, the web shows "2 days left" from it).
+  - The web writes the plan name from `code` with `t()`. It shows `name` only when it has no text for that code
+    (a plan added later in the `plans` table).
 - `billing` comes from the latest invoice of that subscription. `null` when there is no invoice (a trial that did not pay yet,
   tenants, admins). The web shows "Not billed" when there is a plan and `billing` is `null`, and "-" when there is no plan.
 
@@ -343,13 +346,30 @@ The four cards and the two alerts of the Users page. There is no `range`: "vs la
   (the subscription row does not keep history), then the web hides the badge.
 - `lateOwners.value` counts PAST_DUE subscriptions. `graceDays` is the number of days to pay before listings pause
   (see Payment below). The alert reads "38 owners with late payment. 3 days to pay before listings pause."
+  It links to the list with `billing=PAST_DUE`.
 - `suspendedUsers` counts `users.status = 'SUSPENDED'`.
 - These are the same numbers and rules as `GET /api/admin/auth/stats` (`totalUsers`, `paidSubscriptions`, `lateOwners`).
 
 ### PATCH /api/admin/users/{id}/status
 
 `{ "status": "SUSPENDED", "reason": "..." }` returns the updated user (same shape as one item of the list).
-An admin can only set `ACTIVE` or `SUSPENDED`. Any other value gives 400. Backend writes one row in `audit_logs`.
+An admin can only set `ACTIVE` or `SUSPENDED`. Backend writes one row in `audit_logs` (with the `reason`).
+
+| Case | Answer |
+|---|---|
+| `status` is not ACTIVE or SUSPENDED | 400 `STATUS_INVALID` |
+| `status` is SUSPENDED and `reason` is empty | 400 `REASON_REQUIRED` (the reason is optional for ACTIVE) |
+| The user is an ADMIN | 403 `FORBIDDEN` (admins are not suspended from this screen) |
+| The user does not exist (or is DELETED) | 404 `USER_NOT_FOUND` |
+
+Backend rules when a user is suspended:
+
+- The user cannot log in (the login answers 403 `ACCOUNT_SUSPENDED`) and all their refresh tokens are revoked
+  (`refresh_tokens.revoked_at`) in the same transaction. An access token that is already out works until it expires.
+- Listings of a suspended owner are hidden from tenants. P2, **required before real launch**.
+- Telling the user about the suspension (notification or email). P2.
+
+Reactivating (ACTIVE) only lets the user log in again. The refresh tokens stay revoked, the user logs in again.
 
 ## Listings (T38)
 

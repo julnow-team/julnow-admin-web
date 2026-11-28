@@ -51,6 +51,7 @@
   --shadow-popover: var(--effect-shadow-popover);
   --shadow-dialog: var(--effect-shadow-dialog);
   --shadow-drawer: var(--effect-shadow-drawer);
+  --shadow-auth: var(--effect-shadow-auth);
 
   --color-overlay: var(--color-bg-overlay);
   --color-segment: var(--color-segment-track);

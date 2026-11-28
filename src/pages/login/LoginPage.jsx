@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { CircleAlert } from 'lucide-react'
 import Button from '../../components/Button'
-import { LanguageToggle, ThemeToggle } from '../../components/PreferenceToggles'
+import FormField from '../../components/FormField'
+import PasswordField from '../../components/PasswordField'
+import Notice from '../../components/Notice'
+import AuthLayout from '../../components/layout/AuthLayout'
 import { useAuth } from '../../lib/auth'
 import { errorText } from '../../lib/errorText'
 import { useI18n } from '../../lib/i18n'
 
-// Simple version. T21 part B replaces it with the Figma screen.
 export default function LoginPage() {
   const { t } = useI18n()
   const { isLoggedIn, login } = useAuth()
@@ -37,54 +40,46 @@ export default function LoginPage() {
     }
   }
 
+  // A wrong email or password is shown on both fields, the server does not say which one
+  const wrongLogin = error?.code === 'LOGIN_INVALID'
+
   return (
-    <main className="relative flex min-h-screen items-center justify-center p-6">
-      <div className="absolute top-6 right-6 flex gap-3">
-        <LanguageToggle />
-        <ThemeToggle />
-      </div>
+    <AuthLayout cardClassName="w-126 p-9">
+      <h1 className="text-2xl font-semibold text-ink">{t('login.title')}</h1>
+      <p className="mt-1 text-sm text-muted">{t('login.subtitle')}</p>
 
-      <div className="w-full max-w-sm rounded-xl border border-line bg-surface p-8">
-        <h1 className="text-2xl font-semibold">{t('login.title')}</h1>
-        <p className="mt-1 text-sm text-muted">{t('login.subtitle')}</p>
+      <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
+        <FormField
+          label={t('login.email')}
+          type="email"
+          required
+          autoComplete="username"
+          value={email}
+          invalid={wrongLogin}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="admin@julnow.com"
+        />
+        <PasswordField
+          label={t('login.password')}
+          required
+          autoComplete="current-password"
+          value={password}
+          invalid={wrongLogin}
+          onChange={(event) => setPassword(event.target.value)}
+        />
 
-        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
-          <label className="flex flex-col gap-1 text-sm font-medium">
-            {t('login.email')}
-            <input
-              type="email"
-              required
-              autoComplete="username"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="admin@julnow.com"
-              className="h-10 rounded-md border border-line bg-surface px-3 focus:border-primary focus:outline-none"
-            />
-          </label>
+        {error && (
+          <Notice tone="danger" icon={CircleAlert}>
+            {errorText(error, t)}
+          </Notice>
+        )}
 
-          <label className="flex flex-col gap-1 text-sm font-medium">
-            {t('login.password')}
-            <input
-              type="password"
-              required
-              autoComplete="current-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="h-10 rounded-md border border-line bg-surface px-3 focus:border-primary focus:outline-none"
-            />
-          </label>
+        <Button type="submit" loading={loading} className="mt-2 w-full">
+          {t('login.submit')}
+        </Button>
+      </form>
 
-          {error && (
-            <p role="alert" className="text-sm text-danger">
-              {errorText(error, t)}
-            </p>
-          )}
-
-          <Button type="submit" loading={loading} className="mt-2">
-            {t('login.submit')}
-          </Button>
-        </form>
-      </div>
-    </main>
+      <p className="mt-6 text-center text-xs font-medium tracking-[0.01em] text-muted">{t('login.support')}</p>
+    </AuthLayout>
   )
 }

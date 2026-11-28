@@ -21,6 +21,8 @@ export default {
   'common.loading': 'Loading…',
   'common.error': 'Could not load the data. Please try again.',
   'common.retry': 'Try again',
+  'common.cancel': 'Cancel',
+  'common.close': 'Close',
 
   'time.justNow': 'Just now',
   'time.minAgo': '{count} min ago',
@@ -53,6 +55,21 @@ export default {
   'monthShort.10': 'Oct',
   'monthShort.11': 'Nov',
   'monthShort.12': 'Dec',
+
+  'search.clear': 'Clear search',
+
+  'table.empty': 'No results',
+  'table.emptyHint': 'Try a different search or filter.',
+  'table.reset': 'Reset filters',
+  'table.errorTitle': 'Could not load the data',
+  'table.errorHint': 'Please try again.',
+  'table.rowActions': 'Row actions',
+
+  'pagination.label': 'Pagination',
+  'pagination.summary': 'Showing {from}–{to} of {total} {label}',
+  'pagination.previous': 'Previous page',
+  'pagination.next': 'Next page',
+  'pagination.page': 'Page {page}',
 
   'placeholder.body': 'This page is built in {task}.',
   'placeholder.later': 'a later task',

@@ -21,6 +21,8 @@ export default {
   'common.loading': 'កំពុងផ្ទុក…',
   'common.error': 'មិនអាចផ្ទុកទិន្នន័យបានទេ សូមព្យាយាមម្តងទៀត។',
   'common.retry': 'ព្យាយាមម្តងទៀត',
+  'common.cancel': 'បោះបង់',
+  'common.close': 'បិទ',
 
   'time.justNow': 'ទើបតែ',
   'time.minAgo': '{count} នាទីមុន',
@@ -53,6 +55,21 @@ export default {
   'monthShort.10': 'តុលា',
   'monthShort.11': 'វិច្ឆិកា',
   'monthShort.12': 'ធ្នូ',
+
+  'search.clear': 'សម្អាតការស្វែងរក',
+
+  'table.empty': 'គ្មានលទ្ធផល',
+  'table.emptyHint': 'សាកល្បងស្វែងរក ឬតម្រងផ្សេង។',
+  'table.reset': 'កំណត់តម្រងឡើងវិញ',
+  'table.errorTitle': 'មិនអាចផ្ទុកទិន្នន័យបានទេ',
+  'table.errorHint': 'សូមព្យាយាមម្តងទៀត។',
+  'table.rowActions': 'សកម្មភាពនៃជួរ',
+
+  'pagination.label': 'ការបែងចែកទំព័រ',
+  'pagination.summary': 'កំពុងបង្ហាញ {from}–{to} ក្នុងចំណោម {total} {label}',
+  'pagination.previous': 'ទំព័រមុន',
+  'pagination.next': 'ទំព័របន្ទាប់',
+  'pagination.page': 'ទំព័រ {page}',
 
   'placeholder.body': 'ទំព័រនេះនឹងបង្កើតក្នុង {task}។',
   'placeholder.later': 'កិច្ចការពេលក្រោយ',

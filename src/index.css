@@ -48,6 +48,13 @@
   --color-travel-subtle: var(--color-category-travel-subtle);
 
   --shadow-card: var(--effect-shadow-card);
+  --shadow-popover: var(--effect-shadow-popover);
+  --shadow-dialog: var(--effect-shadow-dialog);
+  --shadow-drawer: var(--effect-shadow-drawer);
+
+  --color-overlay: var(--color-bg-overlay);
+  --color-segment: var(--color-segment-track);
+  --color-segment-active: var(--color-segment-thumb);
 
   /* Text sizes from Figma that Tailwind does not have */
   --text-metric: 28px;
@@ -60,6 +67,11 @@
   body {
     @apply bg-canvas text-ink;
     font-family: var(--font-sans);
+  }
+
+  /* The page behind an open dialog or drawer does not scroll */
+  body:has(dialog[open]) {
+    overflow: hidden;
   }
 }
 

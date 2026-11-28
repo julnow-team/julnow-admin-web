@@ -41,7 +41,13 @@ npm run build    # must pass before a PR
 
 ## Figma (file key uUcxCTURdJGi4X444NZ8Dp, page DashBoard 5:119)
 
-Build each screen to match its Figma frame. Screens are 1728 wide: sidebar 260, top bar 64, content padding 32.
+Build each screen from its Figma frame. Screens are 1728 wide: sidebar 260, top bar 64, content padding 32.
+
+Figma is the guide for layout, structure and what each screen contains, not a strict rule.
+
+- Khmer text is not in Figma. Write natural, easy Khmer yourself.
+- Colours: use our tokens and keep colours few and consistent across the app. If Figma uses too many colours or is inconsistent, simplify and tell Sopheak.
+- If Figma does not fit the business rules, propose a change with the reason.
 
 | Screen | Node |
 |---|---|

@@ -6,6 +6,7 @@ import LoginPage from './pages/login/LoginPage'
 import MfaPage from './pages/login/MfaPage'
 import PlaceholderPage from './pages/PlaceholderPage'
 import OverviewPage from './pages/overview/OverviewPage'
+import UsersPage from './pages/users/UsersPage'
 
 // The demo page is only for developers. In a production build this line is removed.
 const ComponentsDemo = import.meta.env.DEV ? lazy(() => import('./pages/dev/ComponentsDemo')) : null
@@ -18,7 +19,7 @@ export default function App() {
       <Route element={<RequireAuth />}>
         <Route element={<AdminLayout />}>
           <Route index element={<OverviewPage />} />
-          <Route path="users" element={<PlaceholderPage titleKey="nav.users" task="T37" />} />
+          <Route path="users" element={<UsersPage />} />
           <Route path="listings" element={<PlaceholderPage titleKey="nav.listings" task="T38" />} />
           <Route path="subscriptions" element={<PlaceholderPage titleKey="nav.subscriptions" />} />
           <Route path="reports" element={<PlaceholderPage titleKey="nav.reports" task="T61" />} />

@@ -123,7 +123,7 @@ export default function Table({ columns, rows, rowKey = 'id', loading = false, e
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="relative overflow-x-auto">
       <table aria-busy={loading} className="w-full table-fixed border-collapse text-left" style={{ minWidth }}>
         <colgroup>
           {columns.map((column) => (

@@ -27,6 +27,7 @@ Example numbers come from the Figma Overview screen.
 | `/api/admin/auth/**`, `/api/admin/users/**`, `/api/admin/me` | auth-service (8081) |
 | `/api/admin/listings/**` | listing-service (8082) |
 | `/api/admin/bookings/**` | booking-service (8083) |
+| `/api/subscriptions/**` (JWT), `/api/payments/payway/callback` (public, PayWay) | auth-service (8081) |
 
 The Gateway only routes and checks the JWT. It does not collect data from the services.
 
@@ -49,10 +50,14 @@ Priority: P1 = needed for the demo, P2 = after P1, Later = mock only, no real en
 | POST /api/admin/auth/mfa/resend | T21 | P1 | done | not started |
 | POST /api/admin/auth/refresh | T21 | P2 | not built | not started |
 | POST /api/admin/auth/logout | T21 | P2 | not built | not started |
-| GET /api/admin/users | T37 | P1 | todo | not started |
-| PATCH /api/admin/users/{id}/status | T37 | P1 | todo | not started |
+| GET /api/admin/users | T37 | P1 | done | not started |
+| GET /api/admin/users/stats | T37 | P1 | done | not started |
+| PATCH /api/admin/users/{id}/status | T37 | P1 | done | not started |
 | GET /api/admin/listings | T38 | P1 | todo | not started |
 | POST /api/admin/listings/{id}/moderation | T38 | P1 | todo | not started |
+| POST /api/subscriptions/checkout | mobile | P1 | none (not the admin web) | not started |
+| GET /api/subscriptions/invoices/{id} | mobile | P1 | none (not the admin web) | not started |
+| POST /api/payments/payway/callback | PayWay | P1 | none | not started |
 
 ## Overview (T50)
 
@@ -68,8 +73,8 @@ The web puts some numbers together itself:
 - Alert cards use the same data: late owners from `subscriptionHealth.lateOwners`, new and flagged listings
   from `submissions`.
 
-`change` is the percent against the period before. If the backend cannot work it out (for example revenue, there is no
-invoices table yet), it sends `null` and the web hides the badge. Otherwise the web shows the real sign, `+` or `-`.
+`change` is the percent against the period before. If the backend cannot work it out (for example revenue, which needs
+the PAID invoices, see Payment), it sends `null` and the web hides the badge. Otherwise the web shows the real sign, `+` or `-`.
 
 Subtitles on the page: Subscription health shows the month of `asOf`. Owner journey shows the label of the chosen
 range ("Last 30 days"), not a month.
@@ -254,7 +259,9 @@ Until this is built, a page refresh logs the admin out (the access token is only
 
 ## Users (T37)
 
-`GET /api/admin/users?page=0&size=10&q=sok&status=ACTIVE&role=OWNER`
+Both endpoints are in auth-service. The list leaves out users with status DELETED.
+
+### GET /api/admin/users?page=0&size=10&q=sok&role=OWNER&status=ACTIVE&trust=VERIFIED&plan=PRO&billing=PAST_DUE
 
 ```json
 {
@@ -266,6 +273,9 @@ Until this is built, a page refresh logs the admin out (the access token is only
       "phone": "012345678",
       "role": "OWNER",
       "status": "ACTIVE",
+      "trust": "VERIFIED",
+      "plan": { "code": "PRO", "name": "Pro", "status": "ACTIVE", "endsAt": "2026-12-31T00:00:00Z", "graceUntil": null },
+      "billing": "PAID",
       "lastLoginAt": "2026-12-01T08:30:00Z",
       "createdAt": "2026-10-02T03:10:00Z"
     }
@@ -274,10 +284,92 @@ Until this is built, a page refresh logs the admin out (the access token is only
 }
 ```
 
-`role`: TENANT, OWNER, ADMIN. `status`: ACTIVE, SUSPENDED, DELETED.
+Newest first (`created_at` descending).
 
-`PATCH /api/admin/users/{id}/status` with `{ "status": "SUSPENDED", "reason": "..." }` returns the updated user.
-An admin can only set `ACTIVE` or `SUSPENDED`. Any other value gives 400. Backend writes one row in `audit_logs`.
+| Filter | Values | Meaning |
+|---|---|---|
+| `q` | text | Part of `full_name` or `email` (not case sensitive) |
+| `role` | TENANT, OWNER, ADMIN | `users.role` |
+| `status` | ACTIVE, SUSPENDED | `users.status` |
+| `trust` | VERIFIED, FLAGGED, UNVERIFIED | the `trust` rule below |
+| `plan` | TRIAL, STARTER, PRO, NONE | `plan.code`. `NONE` = users without a subscription |
+| `billing` | PAID, UNPAID, PAST_DUE, FAILED | the `billing` value below. Users with `billing: null` are never in the result |
+
+Fields:
+
+- `status`: ACTIVE or SUSPENDED. This is only the account status. Trial, late and paused belong to `plan` and `billing`.
+- `trust` is worked out by the backend, it is not stored. `null` for ADMIN users.
+  - FLAGGED: the user has a report with `target_type = 'USER'` and status OPEN, REVIEWING or ESCALATED
+    (reports on a listing are not counted in the MVP, that is P2)
+  - else VERIFIED: `users.phone_verified` is true
+  - else UNVERIFIED
+- `plan` is the latest subscription of the user (`subscriptions`, newest `created_at`) joined to `plans`. `null` when the user has none
+  (tenants and admins).
+  - `code` is `subscriptions.plan_code`, `name` is `plans.name`, `status` is `subscriptions.status`
+    (TRIALING, ACTIVE, PAST_DUE, CANCELLED, EXPIRED), `endsAt` is `current_period_end`, `graceUntil` is `grace_until`
+    (only PAST_DUE has it, the web shows "2 days left" from it).
+  - The web writes the plan name from `code` with `t()`. It shows `name` only when it has no text for that code
+    (a plan added later in the `plans` table).
+- `billing` comes from the latest invoice of that subscription. `null` when there is no invoice (a trial that did not pay yet,
+  tenants, admins). The web shows "Not billed" when there is a plan and `billing` is `null`, and "-" when there is no plan.
+
+| `billing` | When |
+|---|---|
+| PAID | latest invoice is PAID |
+| UNPAID | latest invoice is PENDING and the subscription is not PAST_DUE |
+| PAST_DUE | latest invoice is PENDING and the subscription is PAST_DUE |
+| FAILED | latest invoice is FAILED |
+
+  REFUNDED is not used in the MVP (no refund flow). If it ever happens the backend sends `null`.
+- The Figma columns Usage ("4 / 10 listings") and the "Restricted" status are not in the API. They are dropped for the MVP.
+  Usage needs listing-service, it can come later.
+
+### GET /api/admin/users/stats
+
+The four cards and the two alerts of the Users page. There is no `range`: "vs last month" is fixed.
+
+```json
+{
+  "asOf": "2026-09-30T09:00:00Z",
+  "totalUsers": { "value": 12847, "change": 8.2 },
+  "tenants": { "value": 10215, "change": 7.9 },
+  "owners": { "value": 2598, "change": 9.6 },
+  "paidSubscriptions": { "value": 1818, "change": 8.7, "onTrial": 94 },
+  "lateOwners": { "value": 38, "graceDays": 3 },
+  "suspendedUsers": 41
+}
+```
+
+- `totalUsers`, `tenants`, `owners` count users with status not DELETED (`tenants` and `owners` by `role`, ADMIN is only in the total).
+  `change` is the percent against 30 days ago, worked out from `created_at`. `null` if there was nobody 30 days ago.
+- `paidSubscriptions.value` counts ACTIVE subscriptions. `onTrial` counts TRIALING. `change` may be `null`
+  (the subscription row does not keep history), then the web hides the badge.
+- `lateOwners.value` counts PAST_DUE subscriptions. `graceDays` is the number of days to pay before listings pause
+  (see Payment below). The alert reads "38 owners with late payment. 3 days to pay before listings pause."
+  It links to the list with `billing=PAST_DUE`.
+- `suspendedUsers` counts `users.status = 'SUSPENDED'`.
+- These are the same numbers and rules as `GET /api/admin/auth/stats` (`totalUsers`, `paidSubscriptions`, `lateOwners`).
+
+### PATCH /api/admin/users/{id}/status
+
+`{ "status": "SUSPENDED", "reason": "..." }` returns the updated user (same shape as one item of the list).
+An admin can only set `ACTIVE` or `SUSPENDED`. Backend writes one row in `audit_logs` (with the `reason`).
+
+| Case | Answer |
+|---|---|
+| `status` is not ACTIVE or SUSPENDED | 400 `STATUS_INVALID` |
+| `status` is SUSPENDED and `reason` is empty | 400 `REASON_REQUIRED` (the reason is optional for ACTIVE) |
+| The user is an ADMIN | 403 `FORBIDDEN` (admins are not suspended from this screen) |
+| The user does not exist (or is DELETED) | 404 `USER_NOT_FOUND` |
+
+Backend rules when a user is suspended:
+
+- The user cannot log in (the login answers 403 `ACCOUNT_SUSPENDED`) and all their refresh tokens are revoked
+  (`refresh_tokens.revoked_at`) in the same transaction. An access token that is already out works until it expires.
+- Listings of a suspended owner are hidden from tenants. P2, **required before real launch**.
+- Telling the user about the suspension (notification or email). P2.
+
+Reactivating (ACTIVE) only lets the user log in again. The refresh tokens stay revoked, the user logs in again.
 
 ## Listings (T38)
 
@@ -312,3 +404,113 @@ An admin can only set `ACTIVE` or `SUSPENDED`. Any other value gives 400. Backen
 `{ "action": "REQUEST_CHANGES" | "REJECT" | "PAUSE", "reason": "..." }`.
 Reason is required for REQUEST_CHANGES, REJECT and PAUSE. Returns the updated listing.
 Backend writes `moderation_logs` and sends a notification to the owner.
+
+## Payment (owner subscriptions)
+
+Owners pay for Starter and Pro with ABA PayWay KHQR. We build with the PayWay sandbox first and change to the
+production keys later (only the backend settings change). The Admin web does not call these endpoints. The mobile app does.
+The admin only sees the result in the Users page (`plan` and `billing`) and in the Overview numbers.
+
+All of it is in **auth-service** (8081): `subscriptions`, `plans` and `invoices` are in `julnow_auth`.
+
+### Flow
+
+1. The owner picks a plan in the app. `POST /api/subscriptions/checkout` creates an invoice (PENDING) and asks PayWay for a KHQR.
+2. The app shows the QR. The owner pays with any KHQR bank app.
+3. PayWay calls our callback. The backend checks the payment with PayWay, then the invoice becomes PAID and the
+   subscription becomes ACTIVE for 30 days.
+4. The app polls `GET /api/subscriptions/invoices/{id}` until the invoice is PAID (or the QR time is over).
+5. Renewal: 3 days before `current_period_end` a daily job creates the next invoice (PENDING) for the same plan.
+   The owner pays it with a new QR.
+6. If the invoice is still unpaid at `current_period_end`, the subscription becomes PAST_DUE and `grace_until` = period end +
+   `graceDays` (3). If it is still unpaid at `grace_until`, the subscription becomes EXPIRED and the owner's listings are paused.
+   Pausing the listings is a call to listing-service. It is P2, but **required before real launch** (for now the job only changes the subscription).
+
+When an invoice is paid: `status` = ACTIVE, `grace_until` = null and the period is 30 days. A renewal paid before the end
+starts at the old `current_period_end`. A first payment, or a payment after the period ended, starts now. The days left of a
+trial are not carried over.
+
+### Endpoints
+
+| Endpoint | Who calls it | Gateway | What it does |
+|---|---|---|---|
+| POST /api/subscriptions/checkout | mobile app (OWNER) | JWT | Body `{ "planCode": "PRO" }`. Creates the invoice and the QR. |
+| GET /api/subscriptions/invoices/{id} | mobile app (OWNER, own invoice) | JWT | Status check. |
+| POST /api/payments/payway/callback | PayWay | public, no JWT | PayWay tells us the payment result. |
+
+`POST /api/subscriptions/checkout` returns:
+
+```json
+{
+  "invoiceId": 77,
+  "planCode": "PRO",
+  "amount": 29,
+  "status": "PENDING",
+  "qrString": "00020101021230...",
+  "qrExpiresAt": "2026-12-01T08:45:00Z"
+}
+```
+
+- The owner's `planCode` must be STARTER or PRO. TRIAL gives 400 `PLAN_INVALID`.
+- If the owner already has a PENDING invoice, the backend uses it. When its QR has expired it makes a new QR on the same
+  invoice. If the owner picked a different plan, the invoice gets the new `plan_code` and `amount` and a new QR.
+  So there is never more than one PENDING invoice, and an expired QR never makes a new invoice.
+- **A new QR replaces the old one (expired or plan change): the backend closes the old PayWay transaction first**, with the
+  old `payway_tran_id`, so the old QR cannot be paid. Then it makes the new transaction. Order:
+  1. Ask PayWay for the old transaction. If it was already paid, handle it like a callback (see below) and stop.
+  2. Close the old transaction. If PayWay cannot close it, no new QR is made, the answer is 502 `PAYMENT_UNAVAILABLE`.
+  3. Only then save the new `payway_tran_id`, `qr_string` and `qr_expires_at` on the invoice.
+- `tran_id` starts with `JN<invoiceId>-` and ends with a short unique text (PayWay allows 20 characters at most).
+  The backend reads the invoice id from it, so a callback for an old `tran_id` still finds its invoice.
+- `amount` is `plans.price_monthly` at that moment. The app draws the QR image from `qrString`.
+- Errors: 400 `PLAN_INVALID`, 409 `ALREADY_SUBSCRIBED` (the same plan is ACTIVE and not near its end), 502 `PAYMENT_UNAVAILABLE`
+  (PayWay did not answer).
+
+`GET /api/subscriptions/invoices/{id}` returns `{ "invoiceId": 77, "status": "PENDING", "paidAt": null, "qrExpiresAt": "..." }`.
+`status`: PENDING, PAID, FAILED. While the invoice is PENDING and the callback has not come, the backend asks PayWay itself
+(check transaction), so a lost callback does not block the owner.
+
+`POST /api/payments/payway/callback` (called by PayWay):
+
+- The route is public because PayWay has no JWT. So the backend **never trusts the body**. It reads `tran_id`, calls PayWay
+  "check transaction" with the secret keys, and only a confirmed success marks the invoice PAID.
+- It is safe to call many times (PayWay may send the same callback again): only a PENDING invoice changes, the rest returns 200 and does nothing.
+- Unknown `tran_id` returns 404, nothing changes.
+- **The callback checks the amount.** The money PayWay confirms must equal `invoices.amount`, and the `tran_id` must be the
+  invoice's current `payway_tran_id`. If PayWay reports a payment for an old `tran_id` (a QR that was replaced) or the amount is
+  different, the backend does **not** activate the subscription and does not change the invoice status. It writes the reason
+  in `invoices.review_note` (for example `OLD_TRAN_ID` or `AMOUNT_MISMATCH 25.00 / 29.00`) and answers 200.
+  An admin looks at it and refunds or fixes it by hand. There is no admin screen for this yet, the invoices with a
+  `review_note` are found with a query.
+- Declined or cancelled payment: invoice FAILED. A QR that is only expired stays PENDING, the owner asks for a new QR on the same invoice.
+- PayWay needs a public HTTPS address for the callback. In the sandbox on a laptop use a tunnel. The PayWay `merchant_id` and
+  keys are in the backend environment, never in the repo and never in the web or the app.
+
+### Invoice and subscription values
+
+- `invoices.status`: PENDING (waiting for payment), PAID, FAILED, REFUNDED (not used in the MVP).
+- An invoice becomes FAILED only when PayWay reports a failed payment. Then the owner starts a new checkout (a new invoice).
+  A QR that expired does not fail the invoice. `invoices.attempt_count` is not used by this flow, it stays 0.
+- `subscriptions.status` does not change. An owner gets a TRIALING subscription at sign-up. Paying moves the same row to ACTIVE with
+  the new `plan_code`. If the trial ended unpaid it is EXPIRED and a new payment makes it ACTIVE again.
+- `graceDays` is a backend setting (3). It is sent in `users/stats` so the web does not hard code it.
+
+### Database changes needed
+
+`invoices` and `subscriptions` in `JulNow_ERD_v3_all.sql` (database `julnow_auth`) miss a few things.
+One new migration file in auth-service (never edit an old one). The `invoices` table is still empty, so `NOT NULL` is safe.
+
+| Table | Add | Why |
+|---|---|---|
+| invoices | `plan_code VARCHAR(10) NOT NULL` + foreign key to `plans (code)` | The plan the owner is buying. The subscription may still be TRIAL while the owner pays for PRO. |
+| invoices | `payway_tran_id VARCHAR(20) UNIQUE` | Our transaction id sent to PayWay. The callback finds the invoice with it. A new QR gets a new id. |
+| invoices | `qr_string TEXT` | The KHQR text, so the app can show the same QR again. |
+| invoices | `qr_expires_at TIMESTAMPTZ` | When the QR stops working. |
+| invoices | `payway_ref VARCHAR(50)` | The approval code PayWay returns when paid. For support and refunds. |
+| invoices | `review_note VARCHAR(255)` | Not empty = a payment that needs an admin (old QR paid, or wrong amount). See the callback rules. |
+| invoices | `CREATE UNIQUE INDEX ... ON invoices (subscription_id) WHERE status = 'PENDING'` | At most one open invoice per subscription (no double charge). |
+
+`paid_at`, `amount`, `status`, `attempt_count`, `period_start` and `period_end` already exist. `subscriptions` has everything
+needed (`status`, `current_period_end`, `grace_until`, `cancel_at_period_end`), nothing to add.
+The reports index from the Users decision (`reports (target_type, target_id, status)`) goes in the same migration or a second one.
+Also change the comment on `invoices` in the ERD from `[Later]` to `[P1]`.
